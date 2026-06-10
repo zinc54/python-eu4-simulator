@@ -1,0 +1,37 @@
+{
+    "playerCountry": "StrongCountry",
+    "monthlyAdvisorExpenses": 14,
+    "monthsPassed": 12,
+    "countries": [
+        {
+            "name": "WeakCountry",
+            "morale": 4.0,
+            "discipline": 1.0,
+            "troops": 10000,
+            "technology": {
+                "mil": 3,
+                "dip": 3,
+                "admin": 3
+            },
+            "ducats": 100.0,
+            "income": 0,
+            "monthlyInterestPayments": 0,
+            "loans": 0
+        },
+        {
+            "name": "StrongCountry",
+            "morale": 5.0,
+            "discipline": 1.1,
+            "troops": 42000,
+            "technology": {
+                "mil": 5,
+                "dip": 3,
+                "admin": 3
+            },
+            "ducats": 280.0,
+            "income": 0,
+            "monthlyInterestPayments": 0,
+            "loans": 0
+        }
+    ]
+}
