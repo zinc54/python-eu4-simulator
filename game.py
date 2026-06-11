@@ -1,13 +1,14 @@
 import time
 import json
 from country import Country
-import random
 from event_system import EventSystem
+import msvcrt
 
 class Game:
     def __init__(self):
         self.monthsPassed = 0
         self.eventSys = EventSystem()
+        self.running = True
     def saveGame(self, countries, testing):
         countryDataList = []
         for country in countries:
@@ -54,22 +55,46 @@ class Game:
             country.processMonthlyEconomy(self.monthlyAdvisorExpenses, self.pickedCountryName)
             print(f"{country.name} has {country.ducats:.2f} ducats left!")
         self.monthsPassed += 1
-        print("We are now at month " + str(self.monthsPassed))
+    def pauseMenu(self, playerInput, countries, testing):
+        if playerInput == 1:
+            return None
+        elif playerInput == 2:
+            self.saveGame(countries, testing)
+        elif playerInput == 3:
+            loadAbleCountries = self.loadGame(testing)
+            if loadAbleCountries != False:
+                return loadAbleCountries
+        elif playerInput == 4:
+            self.running = False
+            print("Exiting game. Goodbye!")
+            raise SystemExit
     def run(self, countries, maxMonths):
         last_month_time = time.monotonic()
         while self.monthsPassed < maxMonths:
             if time.monotonic() - last_month_time >= 0.05:
                 last_month_time = time.monotonic()
                 self.advanceMonth(countries)
-                if self.monthsPassed % 24 == 0:
-                    while True:
-                        saveChoice = input("Do you want to save the game? yes/no: ")    
-                        if saveChoice.lower() == "yes":
-                            self.saveGame(countries, False)
-                            break
-                        elif saveChoice.lower() == "no":
-                            break
-                        print("Please type either yes or no.")
+                if msvcrt.kbhit():
+                    key = msvcrt.getch()
+                    if key == b"\x1b":
+                        print("1. Continue")
+                        print("2. Save Game")
+                        print("3. Load Game")
+                        print("4. Exit Game")
+                        while True:
+                            try:
+                                playerInput = int(input("Choose which option by entering a number 1 through 4: "))
+                                if playerInput in [1,2,3,4]:
+                                    result = self.pauseMenu(playerInput, countries, False)
+                                    if result is not None:
+                                        countries = result
+                                    break
+                                else:
+                                    print("Please only input a whole number 1 through 4: ")
+                                    continue
+                            except ValueError:
+                                print("Please only input a number.")
+                                continue
                 if self.monthsPassed % 12 == 0:
                     for country in countries:
                         if country.name == self.pickedCountryName:

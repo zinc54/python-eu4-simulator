@@ -206,5 +206,52 @@ class GameFileTests(unittest.TestCase):
         eventSys.applyEventChoice(strongerCountry, "We need to invest long term!")
         self.assertEqual(oldDucats - strongerCountry.ducats, 50)
         self.assertEqual(strongerCountry.income - oldIncome, 2)
+    def test_pauseMenu(self):
+        testSave = Game()
+        weakerCountry = Country(
+            "WeakCountry",
+            4.0,
+            "100%",
+            10000,
+            {"mil": 3, "dip": 3, "admin": 3},
+            200,
+            0
+        )
+        strongerCountry = Country(
+            "StrongCountry",
+            5.0,
+            "110%",
+            40000,
+            {"mil": 5, "dip": 3, "admin": 3},
+            700,
+            0           
+        )
+        originalCountries = [weakerCountry, strongerCountry]
+        inputOneResult = testSave.pauseMenu(1, originalCountries, True)
+        self.assertEqual(inputOneResult, None)
+        testSave.pickedCountryName = "StrongCountry"
+        testSave.monthlyAdvisorExpenses = 14
+        testSave.monthsPassed = 12
+        strongerCountry.recruitTroops(2)
+        testSave.pauseMenu(2, originalCountries, True)
+        loadedCountries = []
+        loadedCountries = testSave.pauseMenu(3, originalCountries, True)
+        for i in range(0, 2):
+            self.assertEqual(testSave.pickedCountryName, "StrongCountry")
+            self.assertEqual(testSave.monthlyAdvisorExpenses, 14)
+            self.assertEqual(testSave.monthsPassed, 12)
+            self.assertEqual(loadedCountries[i].name, originalCountries[i].name)
+            self.assertEqual(loadedCountries[i].morale, originalCountries[i].morale)
+            self.assertEqual(loadedCountries[i].discipline, originalCountries[i].discipline)
+            self.assertEqual(loadedCountries[i].troops, originalCountries[i].troops)
+            self.assertEqual(loadedCountries[i].technology, originalCountries[i].technology)
+            self.assertEqual(loadedCountries[i].ducats, originalCountries[i].ducats)
+            self.assertEqual(loadedCountries[i].income, originalCountries[i].income)
+            self.assertEqual(loadedCountries[i].monthlyInterestPayments, originalCountries[i].monthlyInterestPayments)
+            self.assertEqual(loadedCountries[i].loans, originalCountries[i].loans)
+        with self.assertRaises(SystemExit):
+            testSave.pauseMenu(4, originalCountries, True)
+        self.assertFalse(testSave.running)
+
 if __name__ == "__main__":
     unittest.main()
