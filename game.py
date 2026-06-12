@@ -9,6 +9,13 @@ class Game:
         self.monthsPassed = 0
         self.eventSys = EventSystem()
         self.running = True
+        self.monthlyAdvisorExpenses = 0
+        self.advisorCosts = {
+            0: 0,
+            1: 1,
+            2: 4,
+            3: 9
+        }
     def saveGame(self, countries, testing):
         countryDataList = []
         for country in countries:
@@ -151,8 +158,6 @@ class Game:
                 print("Pick a whole number that is either 1, 2 or 3 please.")
     def advisorSetup(self):
         self.advisors = {}
-        self.advisorCosts = {1: 1, 2: 4, 3: 9}
-        self.monthlyAdvisorExpenses = 0
         while True:
             self.pickedCountryName = input("Which country do you want to play as: ")
             if self.pickedCountryName.lower() == "ottomans":

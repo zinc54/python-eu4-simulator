@@ -79,7 +79,7 @@ class CountryTests(unittest.TestCase):
 class BattleTests(unittest.TestCase):
     def test_battles(self):
         weakerCountry = Country(
-            "WeakCountry",
+            "France",
             4.0,
             "100%",
             10000,
@@ -88,7 +88,7 @@ class BattleTests(unittest.TestCase):
             0
         )
         strongerCountry = Country(
-            "StrongCountry",
+            "Ottomans",
             5.0,
             "110%",
             40000,
@@ -111,7 +111,7 @@ class BattleTests(unittest.TestCase):
 class GameFileTests(unittest.TestCase):
     def test_monthPassing(self):
         weakerCountry = Country(
-            "WeakCountry",
+            "France",
             4.0,
             "100%",
             10000,
@@ -120,7 +120,7 @@ class GameFileTests(unittest.TestCase):
             0
         )
         strongerCountry = Country(
-            "StrongCountry",
+            "Ottomans",
             5.0,
             "110%",
             40000,
@@ -129,7 +129,7 @@ class GameFileTests(unittest.TestCase):
             0           
         )
         testSave = Game()
-        testSave.pickedCountryName = "StrongCountry"
+        testSave.pickedCountryName = "Ottomans"
         testSave.monthlyAdvisorExpenses = 1
         countries = [weakerCountry, strongerCountry]
         for i in range(12):
@@ -139,7 +139,7 @@ class GameFileTests(unittest.TestCase):
         self.assertEqual(strongerCountry.ducats, 192)
     def test_Saving(self):
         weakerCountry = Country(
-            "WeakCountry",
+            "France",
             4.0,
             "100%",
             10000,
@@ -148,7 +148,7 @@ class GameFileTests(unittest.TestCase):
             0
         )
         strongerCountry = Country(
-            "StrongCountry",
+            "Ottomans",
             5.0,
             "110%",
             40000,
@@ -158,7 +158,7 @@ class GameFileTests(unittest.TestCase):
         )
         originalCountries = [weakerCountry, strongerCountry]
         testSave = Game()
-        testSave.pickedCountryName = "StrongCountry"
+        testSave.pickedCountryName = "Ottomans"
         testSave.monthlyAdvisorExpenses = 14
         testSave.monthsPassed = 12
         strongerCountry.recruitTroops(2)
@@ -166,7 +166,7 @@ class GameFileTests(unittest.TestCase):
         loadedCountries = []
         loadedCountries = testSave.loadGame(True)
         for i in range(0, 2):
-            self.assertEqual(testSave.pickedCountryName, "StrongCountry")
+            self.assertEqual(testSave.pickedCountryName, "Ottomans")
             self.assertEqual(testSave.monthlyAdvisorExpenses, 14)
             self.assertEqual(testSave.monthsPassed, 12)
             self.assertEqual(loadedCountries[i].name, originalCountries[i].name)
@@ -180,7 +180,7 @@ class GameFileTests(unittest.TestCase):
             self.assertEqual(loadedCountries[i].loans, originalCountries[i].loans)
     def test_event(self):
         weakerCountry = Country(
-            "WeakCountry",
+            "France",
             4.0,
             "100%",
             10000,
@@ -189,7 +189,7 @@ class GameFileTests(unittest.TestCase):
             0
         )
         strongerCountry = Country(
-            "StrongCountry",
+            "Ottomans",
             5.0,
             "110%",
             40000,
@@ -209,7 +209,7 @@ class GameFileTests(unittest.TestCase):
     def test_pauseMenu(self):
         testSave = Game()
         weakerCountry = Country(
-            "WeakCountry",
+            "France",
             4.0,
             "100%",
             10000,
@@ -218,7 +218,7 @@ class GameFileTests(unittest.TestCase):
             0
         )
         strongerCountry = Country(
-            "StrongCountry",
+            "Ottomans",
             5.0,
             "110%",
             40000,
@@ -229,7 +229,7 @@ class GameFileTests(unittest.TestCase):
         originalCountries = [weakerCountry, strongerCountry]
         inputOneResult = testSave.pauseMenu(1, originalCountries, True)
         self.assertEqual(inputOneResult, None)
-        testSave.pickedCountryName = "StrongCountry"
+        testSave.pickedCountryName = "Ottomans"
         testSave.monthlyAdvisorExpenses = 14
         testSave.monthsPassed = 12
         strongerCountry.recruitTroops(2)
@@ -237,7 +237,7 @@ class GameFileTests(unittest.TestCase):
         loadedCountries = []
         loadedCountries = testSave.pauseMenu(3, originalCountries, True)
         for i in range(0, 2):
-            self.assertEqual(testSave.pickedCountryName, "StrongCountry")
+            self.assertEqual(testSave.pickedCountryName, "Ottomans")
             self.assertEqual(testSave.monthlyAdvisorExpenses, 14)
             self.assertEqual(testSave.monthsPassed, 12)
             self.assertEqual(loadedCountries[i].name, originalCountries[i].name)
