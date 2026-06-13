@@ -47,6 +47,7 @@ class Game:
             for countryData in loadedData["countries"]:
                 loadedCountry = self.loadCountry(countryData)
                 countries.append(loadedCountry)
+            print("You have loaded into a new save.")
             return countries
         except FileNotFoundError:
             print("No save file was found")
@@ -60,7 +61,6 @@ class Game:
     def advanceMonth(self, countries):
         for country in countries:
             country.processMonthlyEconomy(self.monthlyAdvisorExpenses, self.pickedCountryName)
-            print(f"{country.name} has {country.ducats:.2f} ducats left!")
         self.monthsPassed += 1
     def pauseMenu(self, playerInput, countries, testing):
         if playerInput == 1:
@@ -145,7 +145,6 @@ class Game:
         )
         loadedCountry.loans = countryData["loans"]
         loadedCountry.monthlyInterestPayments = countryData["monthlyInterestPayments"]
-        print("You have now loaded into a new save!")
         return loadedCountry
     def askAdvisorLevel(self, advisorType):
         while True:

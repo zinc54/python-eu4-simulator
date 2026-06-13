@@ -101,6 +101,7 @@ class BattleTests(unittest.TestCase):
         weakTroopsBefore = weakerCountry.troops
         strongTroopsBefore = strongerCountry.troops
         testBattle = Battle(strongerCountry, weakerCountry)
+        testBattle.resolveBattle()
         # Attacker does 66000 damage here.
         # Defender does 8000 damage here.
         self.assertTrue(testBattle.attackerWon)

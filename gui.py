@@ -1,10 +1,13 @@
 import tkinter as tk
 from game import Game
 from country import Country
+from event_system import EventSystem
+import random
 
 class GameGUI:
     def __init__(self, game, countries):
         self.game = game
+        self.eventSys = EventSystem()
         self.countries = countries
         self.window = tk.Tk()
         self.window.title("Python EU4 Simulator")
@@ -14,6 +17,39 @@ class GameGUI:
         self.buildCountryScreen()
         self.buildGameScreen()
         self.buildAdvisorScreen()
+        self.buildEventScreen()
+        self.buildRecruitingScreen()
+    def buildEventScreen(self):
+        self.eventText = tk.Label(
+            self.eventFrame,
+            text=""
+        )
+        self.eventChoiceOne = tk.Button(
+            self.eventFrame,
+            text=""
+        )
+        self.eventChoiceTwo = tk.Button(
+            self.eventFrame,
+            text=""
+        )
+        self.eventText.pack()
+        self.eventChoiceOne.pack()
+        self.eventChoiceTwo.pack()
+    def buildRecruitingScreen(self):
+        self.recruitmentQuestion = tk.Label(self.recruitmentFrame, text="How many troops in thousands do you wanna recruit? Type in the box below.")
+        self.recruitmentEntry = tk.Entry(self.recruitmentFrame)
+        self.recruitmentButton = tk.Button(
+            self.recruitmentFrame,
+            text="Recruit Troops",
+            command=self.showRecruitmentIfYes
+        )
+        self.recruitmentCancelButton = tk.Button(
+            self.recruitmentFrame,
+            text="Cancel",
+            command=self.cancelRecruitment
+        )
+        self.recruitmentButton.pack()
+        self.recruitmentCancelButton.pack()
     def buildCountryScreen(self):
         self.ottomansButton = tk.Button(
             self.countrySelectionFrame,
@@ -34,13 +70,18 @@ class GameGUI:
             text="New Game",
             command=self.startNewGame
         )
-        
+        self.loadGameButton = tk.Button(
+            self.startFrame,
+            text="Load Game",
+            command=self.showLoadedGame
+        )
         self.exitGameButton = tk.Button(
             self.startFrame,
             text="Exit game",
             command=self.exitGame
         )
         self.newGameButton.pack()
+        self.loadGameButton.pack()
         self.exitGameButton.pack()
         self.startFrame.pack()       
     def createFrames(self):
@@ -48,6 +89,8 @@ class GameGUI:
         self.gameFrame = tk.Frame(self.window)
         self.countrySelectionFrame = tk.Frame(self.window)
         self.advisorSelectionFrame = tk.Frame(self.window)
+        self.eventFrame = tk.Frame(self.window)
+        self.recruitmentFrame = tk.Frame(self.window)
     def buildGameScreen(self):
         self.monthLabel = tk.Label(self.gameFrame, text="Month: 0")
         self.chosenCountryLabel = tk.Label(self.gameFrame, text = f"You are playing as {self.game.pickedCountryName}")
@@ -107,11 +150,64 @@ class GameGUI:
         self.administrativeDropdown.grid(row=2, column=1)
         self.advisorCostLabel.grid(row=3, column=0)
         self.continueButtonAdvisors.grid(row=4, column=0)
+    def showLoadedGame(self):
+        loadedCountries = self.game.loadGame(False)
+        if loadedCountries is False:
+            return
+        self.countries = loadedCountries
+
+        self.startFrame.pack_forget()
+        self.refreshDisplay()
+
+        self.chosenCountryLabel.pack()
+        self.gameFrame.pack()
     def nextMonth(self):
         self.game.advanceMonth(self.countries)
-        self.monthLabel.config(text=f"Month: {self.game.monthsPassed}")
         self.refreshDisplay()
+        if self.game.monthsPassed % 12 == 0:
+            self.showEventScreen()
+        elif self.game.monthsPassed % 6 == 0:
+            self.showRecruitmentScreen()
+    def showRecruitmentScreen(self):
+        self.gameFrame.pack_forget()
+        self.recruitmentFrame.pack()
+    def showRecruitmentIfYes(self):
+        self.recruitmentButton.pack_forget()
+        self.recruitmentCancelButton.pack_forget()
+        self.recruitmentQuestion.pack()
+        self.recruitmentEntry.pack()
+    def cancelRecruitment(self):
+        self.recruitmentFrame.pack_forget()
+        self.gameFrame.pack()
+    def showEventScreen(self):
+        selectedEventText = random.choice(list(self.eventSys.events.keys()))
+        options = list(self.eventSys.events[selectedEventText].values())
+
+        self.eventText.config(text=selectedEventText)
+        self.eventChoiceOne.config(
+            text=f"{options[0]} Consequence: {self.eventSys.eventConsequences[options[0]]['description']}",
+            command=lambda: self.chooseEventOption(options[0])
+        )
+        self.eventChoiceTwo.config(
+            text=f"{options[1]} Consequence: {self.eventSys.eventConsequences[options[1]]['description']}",
+            command=lambda: self.chooseEventOption(options[1])
+        )
+
+        self.gameFrame.pack_forget()
+        self.eventFrame.pack()
+    def chooseEventOption(self, choice):
+        for country in self.countries:
+            if country.name == self.game.pickedCountryName:
+                self.eventSys.applyEventChoice(country, choice)
+                break
+        self.eventFrame.pack_forget()
+        self.refreshDisplay()
+        self.gameFrame.pack()
     def refreshDisplay(self):
+        self.monthLabel.config(text=f"Month: {self.game.monthsPassed}")
+        self.chosenCountryLabel.config(
+            text=f"You are playing as {self.game.pickedCountryName}"
+        )
         self.firstCountryDucats.config(text=f"{self.countries[0].name} has {self.countries[0].ducats:.2f} ducats")
         self.secondCountryDucats.config(text=f"{self.countries[1].name} has {self.countries[1].ducats:.2f} ducats")
         self.firstCountryTroopsLabel.config(text=f"{self.countries[0].name} has {self.countries[0].troops} troops")
