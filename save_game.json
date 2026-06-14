@@ -1,37 +1,37 @@
 {
     "playerCountry": "Ottomans",
-    "monthlyAdvisorExpenses": 12,
-    "monthsPassed": 24,
+    "monthlyAdvisorExpenses": 0,
+    "monthsPassed": 12,
     "countries": [
         {
-            "name": "Ottomans",
-            "morale": 3.8,
-            "discipline": 1.05,
-            "troops": 40000,
-            "technology": {
-                "mil": 4,
-                "dip": 3,
-                "admin": 5
-            },
-            "ducats": 12.666666666666677,
-            "income": -1,
-            "monthlyInterestPayments": 0.6666666666666666,
-            "loans": 1
-        },
-        {
             "name": "France",
-            "morale": 4.5,
-            "discipline": 1.05,
-            "troops": 32000,
+            "morale": 4.0,
+            "discipline": 1.0,
+            "troops": 10000,
             "technology": {
-                "mil": 4,
-                "dip": 4,
+                "mil": 3,
+                "dip": 3,
                 "admin": 3
             },
-            "ducats": 145.39999999999992,
+            "ducats": 76.0,
             "income": 0,
-            "monthlyInterestPayments": 1.0,
-            "loans": 2
+            "monthlyInterestPayments": 0,
+            "loans": 0
+        },
+        {
+            "name": "Ottomans",
+            "morale": 5.0,
+            "discipline": 1.1,
+            "troops": 45000,
+            "technology": {
+                "mil": 5,
+                "dip": 3,
+                "admin": 3
+            },
+            "ducats": 148.0,
+            "income": 0,
+            "monthlyInterestPayments": 0,
+            "loans": 0
         }
     ]
 }

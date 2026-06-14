@@ -2,7 +2,7 @@ import random
 
 class EventSystem:
     def __init__(self):
-        self.eventConsequences = {
+        self.event_consequences = {
                             "We are blessed!": {
                                 "description": "Gain 100 ducats",
                                 "effects": {
@@ -46,22 +46,22 @@ class EventSystem:
             "This year's harvests have been exceptional! Rarely in our nation's history has the earth brought forth so much of its bounty. The populace are already interpreting this as a sign of divine favor for our rule.": {1: "We are blessed!", 2: "We need to invest long term!"},
             "People are finding lots of ways of getting around paying taxes and fees on moving goods, smuggling them past our authorities through a variety of clandestine channels. This is cutting into our income, but stopping it would cost quite a lot in the short-term.": {1: "Use the Military as Workforce", 2: "Spend Money"}
         }
-    def showRandomEvent(self, country):
+    def show_random_event(self, country):
 
-        printableEvents = list(self.events.keys())
-        selectedEvent = random.choice(printableEvents)
-        print(selectedEvent)
-        options =  list(self.events[selectedEvent].values())
-        for eachOption in options:
-            print(eachOption)
+        printable_events = list(self.events.keys())
+        selected_event = random.choice(printable_events)
+        print(selected_event)
+        options =  list(self.events[selected_event].values())
+        for each_option in options:
+            print(each_option)
         while True:
             try:
-                print(f"Consequence of choice 1: {self.eventConsequences[options[0]]['description']}.")
-                print(f"Consequence of choice 2: {self.eventConsequences[options[1]]['description']}.")
-                playerChoice = int(input(f"Press 1 for choice: {options[0]}  Press 2 for choice: {options[1]}"))
+                print(f"Consequence of choice 1: {self.event_consequences[options[0]]['description']}.")
+                print(f"Consequence of choice 2: {self.event_consequences[options[1]]['description']}.")
+                player_choice = int(input(f"Press 1 for choice: {options[0]}  Press 2 for choice: {options[1]}"))
 
-                if playerChoice in [1,2]:
-                    self.applyEventChoice(country, options[playerChoice - 1])
+                if player_choice in [1,2]:
+                    self.apply_event_choice(country, options[player_choice - 1])
                     break
                 else:
                     print("Please choose 1 or 2, not any other number.")
@@ -69,8 +69,8 @@ class EventSystem:
             except ValueError:
                 print("Please only input a whole number that is 1 or 2.")
                 continue
-    def applyEventChoice(self, country, choice):
-        effects = self.eventConsequences[choice]["effects"]
+    def apply_event_choice(self, country, choice):
+        effects = self.event_consequences[choice]["effects"]
         for stat, amount in effects.items():
-            currentValue = getattr(country, stat)
-            setattr(country, stat, currentValue + amount)
+            current_value = getattr(country, stat)
+            setattr(country, stat, current_value + amount)
