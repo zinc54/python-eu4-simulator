@@ -182,6 +182,8 @@ class GameFileTests(unittest.TestCase):
             self.assertEqual(loaded_countries[i].income, original_countries[i].income)
             self.assertEqual(loaded_countries[i].monthly_interest_payments, original_countries[i].monthly_interest_payments)
             self.assertEqual(loaded_countries[i].loans, original_countries[i].loans)
+    def test_sql_saving(self):
+        pass
     def test_event(self):
         weaker_country = Country(
             "France",
