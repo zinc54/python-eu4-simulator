@@ -1,5 +1,6 @@
 import sqlite3
-
+from game import Game
+from country import Country
 class SaveRepository:
     def __init__(self, database_name="eu4_saves.db"):
         self.connection = sqlite3.connect(database_name)
@@ -44,7 +45,7 @@ class SaveRepository:
             """,
             (save_name, game.months_passed, game.picked_country_name, game.monthly_advisor_expenses)
         )
-        save_id = self.cursor.lastrowid
+        self.save_id = self.cursor.lastrowid
         for country in countries:
             self.cursor.execute(
                 """
@@ -52,7 +53,7 @@ class SaveRepository:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    save_id,
+                    self.save_id,
                     country.name,
                     country.morale,
                     country.discipline,
@@ -66,3 +67,56 @@ class SaveRepository:
                     country.loans,
                 )
             )
+        self.cursor.execute("SELECT * FROM countries")
+        saves = self.cursor.fetchall()
+        for save in saves:
+            print(save)
+        self.connection.commit()
+    def load_game(self, save_id):
+        self.loaded_game = Game()
+        self.cursor.execute(
+            """
+            SELECT id, save_name, month, player_country, monthly_advisor_expenses
+            FROM saves
+            where id = ?
+            """,
+            (save_id,)
+        )
+        save_data = self.cursor.fetchone()
+        save_id, _, month, player_country, monthly_advisor_expenses = save_data
+        self.loaded_game.months_passed = month
+        self.loaded_game.picked_country_name = player_country
+        self.loaded_game.monthly_advisor_expenses = monthly_advisor_expenses
+        print(save_data)
+        self.cursor.execute(
+            """
+            SELECT name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans
+            FROM countries 
+            WHERE save_id = ?
+            """,
+            (save_id,)
+        )
+        loaded_countries = []
+        country_rows = self.cursor.fetchall()
+        for country in country_rows:
+            name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans = country
+            technology = {
+                "mil": mil_tech,
+                "dip": dip_tech,
+                "admin": admin_tech
+                }
+            countryObject = Country(name, morale, discipline, troops, technology, ducats, income, False)
+            countryObject.loans = loans
+            countryObject.monthly_interest_payments = monthly_interest_payments
+            loaded_countries.append(countryObject)
+            print(country)
+        return loaded_countries, self.loaded_game
+    def list_saves(self):
+        self.cursor.execute(
+            """
+            SELECT id, save_name, player_country, month
+            FROM saves
+            ORDER BY id
+            """
+        )
+        return self.cursor.fetchall()

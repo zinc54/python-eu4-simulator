@@ -4,6 +4,7 @@ from country import Country
 from battle import Battle
 from game import Game
 from event_system import EventSystem
+from save_repository import SaveRepository
 
 class CountryTests(unittest.TestCase):
     def test_discipline_conversion(self):
@@ -182,8 +183,6 @@ class GameFileTests(unittest.TestCase):
             self.assertEqual(loaded_countries[i].income, original_countries[i].income)
             self.assertEqual(loaded_countries[i].monthly_interest_payments, original_countries[i].monthly_interest_payments)
             self.assertEqual(loaded_countries[i].loans, original_countries[i].loans)
-    def test_sql_saving(self):
-        pass
     def test_event(self):
         weaker_country = Country(
             "France",
@@ -258,6 +257,10 @@ class GameFileTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             test_save.pause_menu(4, original_countries, True)
         self.assertFalse(test_save.running)
-
+    def test_sql_loading(self):
+        test_sql_system = SaveRepository()
+        test_sql_system.load_game(1)
+    def test_sql_saving(self):
+        pass
 if __name__ == "__main__":
     unittest.main()
