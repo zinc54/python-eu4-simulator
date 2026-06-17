@@ -37,13 +37,39 @@ class SaveRepository:
         """)
     def close(self):
         self.connection.close()
+    def delete_save(self, save_id):
+        self.cursor.execute(
+            "DELETE FROM countries WHERE save_id = ?",
+            (save_id,)
+        )
+        self.cursor.execute(
+            "DELETE FROM saves WHERE id = ?",
+            (save_id,)
+        )
+        self.connection.commit()
+    def save_name_exists(self, save_name):
+        self.cursor.execute(
+            "SELECT save_name FROM saves WHERE save_name = ?",
+            (save_name,)
+        )
+        existing_save_name = self.cursor.fetchone()
+        if existing_save_name is None:
+            return False
+        else:
+            return True
     def save_game(self, save_name, game, countries):
+
+        final_save_name = save_name
+        number = 2
+        while self.save_name_exists(final_save_name):
+            final_save_name = f"{save_name}_{number}"
+            number += 1
         self.cursor.execute(
             """
             INSERT INTO saves (save_name, month, player_country, monthly_advisor_expenses)
             VALUES (?, ?, ?, ?)
             """,
-            (save_name, game.months_passed, game.picked_country_name, game.monthly_advisor_expenses)
+            (final_save_name, game.months_passed, game.picked_country_name, game.monthly_advisor_expenses)
         )
         self.save_id = self.cursor.lastrowid
         for country in countries:
@@ -67,11 +93,8 @@ class SaveRepository:
                     country.loans,
                 )
             )
-        self.cursor.execute("SELECT * FROM countries")
-        saves = self.cursor.fetchall()
-        for save in saves:
-            print(save)
         self.connection.commit()
+        return self.save_id
     def load_game(self, save_id):
         self.loaded_game = Game()
         self.cursor.execute(
@@ -87,7 +110,6 @@ class SaveRepository:
         self.loaded_game.months_passed = month
         self.loaded_game.picked_country_name = player_country
         self.loaded_game.monthly_advisor_expenses = monthly_advisor_expenses
-        print(save_data)
         self.cursor.execute(
             """
             SELECT name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans
@@ -109,7 +131,6 @@ class SaveRepository:
             countryObject.loans = loans
             countryObject.monthly_interest_payments = monthly_interest_payments
             loaded_countries.append(countryObject)
-            print(country)
         return loaded_countries, self.loaded_game
     def list_saves(self):
         self.cursor.execute(

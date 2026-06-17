@@ -24,7 +24,6 @@ class GameGUI:
         self.build_recruiting_screen()
         self.build_pause_menu()
         self.window.bind("<Escape>", self.show_pause_menu)
-        self.build_pre_loading()
         self.build_pre_saving()
     def build_pre_saving(self):
         self.save_name_input = tk.Entry(self.pre_save_frame)
@@ -35,17 +34,6 @@ class GameGUI:
         )
         self.save_name_input.pack()
         self.save_selected_name_button.pack()
-    def build_pre_loading(self):
-        saves = self.save_rep.list_saves()
-        for save in saves:
-            save_id, save_name, player_country, month = save
-            button_text = f"{save_id}: {save_name} - {player_country} - Month {month}"
-            save_button = tk.Button(
-                self.pre_load_frame,
-                text=button_text,
-                command=lambda chosen_save_id=save_id: self.show_loaded_game(chosen_save_id)
-            )
-            save_button.pack()
     def build_pause_menu(self, event=None):
         pause_menu_continue_button = tk.Button(
             self.pause_menu_frame,
@@ -133,6 +121,8 @@ class GameGUI:
         self.country_confirmation_label = tk.Label(self.country_selection_frame, text = "")
         self.ottomans_button.pack()
         self.france_button.pack()
+    def show_start_screen(self):
+        self.show_only_frame(self.start_frame)
     def build_start_screen(self):
         self.new_game_button = tk.Button(
             self.start_frame,
@@ -152,7 +142,7 @@ class GameGUI:
         self.new_game_button.pack()
         self.load_game_button.pack()
         self.exit_game_button.pack()
-        self.show_only_frame(self.start_frame)
+        self.show_start_screen()
     def create_frames(self):
         self.start_frame = tk.Frame(self.window)
         self.game_frame = tk.Frame(self.window)
@@ -241,16 +231,37 @@ class GameGUI:
         for widget in self.pre_load_frame.winfo_children():
             widget.destroy()
         saves = self.save_rep.list_saves()
-        for save in saves:
+        if len(saves) == 0:
+            no_saves_explanation = tk.Label(
+                self.pre_load_frame,
+                text="You have no existing saves to load."
+            )
+            go_back_button = tk.Button(
+                self.pre_load_frame,
+                text="Back",
+                command=self.show_start_screen
+            )
+            no_saves_explanation.pack()
+            go_back_button.pack()
+        for index, save in enumerate(saves, start=1):
             save_id, save_name, player_country, month = save
-            button_text = f"{save_id}: {save_name} - {player_country} - Month {month}"
+            button_text = f"{index}: {save_name} - {player_country} - Month {month}"
             save_button = tk.Button(
                 self.pre_load_frame,
                 text=button_text,
                 command=lambda chosen_save_id=save_id: self.show_loaded_game(chosen_save_id)
             )
+            delete_button = tk.Button(
+                self.pre_load_frame,
+                text=f"Delete save {index}",
+                command=lambda chosen_save_id=save_id: self.show_delete_save(chosen_save_id)
+            )
             save_button.pack()
+            delete_button.pack()
         self.show_only_frame(self.pre_load_frame)
+    def show_delete_save(self, save_id):
+        self.save_rep.delete_save(save_id)
+        self.show_pre_loaded_game()
     def show_pre_saved_game(self):
         self.show_only_frame(self.pre_save_frame)
     def show_loaded_game(self, save_id):

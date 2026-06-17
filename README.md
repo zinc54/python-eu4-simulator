@@ -26,14 +26,12 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 ## Project Structure
 
 - `gui.py` - main GUI application and Tkinter screens
-- `game.py` - core game state, month progression, legacy terminal/JSON logic
+- `game.py` - core game state and month progression
 - `country.py` - country stats, economy, loans, recruitment, and damage
 - `battle.py` - battle resolution logic
 - `event_system.py` - random events and their effects
-- `save_repository.py` - SQLite save/load system
+- `save_repository.py` - SQLite save/load/delete system
 - `test_game.py` - automated tests
-- `test_main.py` - older terminal launcher kept for now as legacy code
-- `save_game.json` / `test_save_game.json` - older JSON save files kept for compatibility/tests
 
 ## Running the Game
 
@@ -51,7 +49,7 @@ python -m unittest -v
 
 ## Save System
 
-The current save system uses SQLite through `save_repository.py`.
+The save system uses SQLite through `save_repository.py`.
 
 The database stores:
 
@@ -61,20 +59,25 @@ The database stores:
 - monthly advisor expenses
 - country stats for each saved country
 
-The GUI can list saves from the database and load the selected save by its `save_id`.
+The GUI can:
+
+- create named save slots
+- automatically rename duplicate save names with `_2`, `_3`, etc.
+- list existing saves
+- load a selected save
+- delete saves from the database
+- handle the first-time-player case where no saves exist yet
 
 ## Notes
 
-The project still contains older JSON and terminal code from earlier versions. The current main version is the GUI + SQLite version.
+The current main version is the GUI + SQLite version.
 
 Future cleanup goals:
 
-- Replace old JSON tests with SQLite repository tests
-- Remove or archive the old terminal launcher
-- Add empty-save handling for first-time players
-- Add save name validation
-- Prevent or rename duplicate save names
-- Reduce debug printing from backend classes
+- Add stronger save-name validation
+- Add more tests for SQL delete and duplicate-name behavior
+- Continue separating GUI code from backend game logic
+- Polish the GUI layout and user feedback
 
 ## What I Learned
 
