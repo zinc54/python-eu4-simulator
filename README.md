@@ -21,13 +21,16 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Pause menu with save/load/exit options
 - SQLite save/load system with multiple save slots
 - Dynamic load screen that creates one button per save
+- Duplicate save names are automatically renamed with `_2`, `_3`, etc.
+- Save slots can be deleted from the GUI
 - Automated tests with `unittest`
 
 ## Project Structure
 
-- `gui.py` - main GUI application and Tkinter screens
+- `main.py` - starts the GUI application
+- `gui_app.py` - main GUI application and Tkinter screens
 - `game.py` - core game state and month progression
-- `country.py` - country stats, economy, loans, recruitment, and damage
+- `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
 - `battle.py` - battle resolution logic
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
@@ -38,7 +41,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 Run the GUI version:
 
 ```powershell
-python gui.py
+python main.py
 ```
 
 ## Running the Tests
@@ -75,8 +78,8 @@ The current main version is the GUI + SQLite version.
 Future cleanup goals:
 
 - Add stronger save-name validation
-- Add more tests for SQL delete and duplicate-name behavior
 - Continue separating GUI code from backend game logic
+- Split large GUI sections into smaller modules when the boundaries are clear
 - Polish the GUI layout and user feedback
 
 ## What I Learned
@@ -84,6 +87,7 @@ Future cleanup goals:
 This project helped me learn:
 
 - Classes, objects, `self`, and `__init__`
+- Dataclasses and `__post_init__`
 - Splitting a program into multiple modules
 - GUI programming with Tkinter
 - Buttons, frames, labels, entries, callbacks, and dynamic widgets

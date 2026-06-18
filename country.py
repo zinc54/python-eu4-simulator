@@ -1,21 +1,26 @@
+from dataclasses import dataclass
+
+@dataclass
 class Country:
-    def __init__(self, name, morale, discipline, troops, technology, ducats, income, charge_upfront=True):
-        self.name = name
-        self.morale = morale
-        self.troops = troops
-        self.technology = technology
-        self.income = income
-        self.loans = 0
-        self.max_loans = 10
-        self.monthly_interest_payments = 0
-        if isinstance(discipline, str):
-            number = discipline.replace("%", "")
-            discipline = float(number) / 100
-        self.discipline = discipline
-        self.cost_upfront = (troops / 1000) * 10
-        self.monthly_expenses = (troops / 1000) * 0.2
-        self.ducats = ducats
-        if charge_upfront:
+    name: str
+    morale: float
+    discipline: float | str
+    troops: int
+    technology: dict[str, int]
+    ducats: float
+    income: float
+    charge_upfront: bool = True
+    loans: int = 0
+    max_loans: int = 10
+    monthly_interest_payments: float = 0
+
+    def __post_init__(self):
+        if isinstance(self.discipline, str):
+            number = self.discipline.replace("%", "")
+            self.discipline = float(number) / 100
+        self.cost_upfront = (self.troops / 1000) * 10
+        self.monthly_expenses = (self.troops / 1000) * 0.2
+        if self.charge_upfront:
             self.ducats -= self.cost_upfront
     def to_dictionary(self):
         country_data = {

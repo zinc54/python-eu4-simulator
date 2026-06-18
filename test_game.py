@@ -187,6 +187,16 @@ class GameFileTests(unittest.TestCase):
 
         self.assertEqual(len(remaining_saves), 1)
         self.assertEqual(remaining_saves[0][0], second_save_id)
+    def test_month_action_events(self):
+        game = Game()
 
+        game.months_passed = 12
+        self.assertEqual(game.get_month_action(), "event")
+
+        game.months_passed = 6
+        self.assertEqual(game.get_month_action(), "recruitment")
+
+        game.months_passed = 7
+        self.assertEqual(game.get_month_action(), "continue")
 if __name__ == "__main__":
     unittest.main()
