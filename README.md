@@ -29,6 +29,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 
 - `main.py` - starts the GUI application
 - `gui_app.py` - main GUI application and Tkinter screens
+- `save_load_ui.py` - save/load GUI screens and save-slot buttons
 - `game.py` - core game state and month progression
 - `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
 - `battle.py` - battle resolution logic
@@ -79,6 +80,7 @@ Future cleanup goals:
 
 - Add stronger save-name validation
 - Continue separating GUI code from backend game logic
+- Continue splitting large GUI sections into focused UI modules
 - Split large GUI sections into smaller modules when the boundaries are clear
 - Polish the GUI layout and user feedback
 

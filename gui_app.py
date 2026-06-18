@@ -3,7 +3,7 @@ import tkinter as tk
 
 from event_system import EventSystem
 from save_repository import SaveRepository
-
+from save_load_ui import SaveLoadUI
 
 class GameGUI:
     def __init__(self, game, countries):
@@ -16,6 +16,17 @@ class GameGUI:
         self.window.geometry("600x400")
         self.can_pause = False
         self.create_frames()
+        self.save_load_ui = SaveLoadUI(
+            self.save_rep,
+            self.pre_load_frame,
+            self.pre_save_frame,
+            self.show_only_frame,
+            self.show_start_screen,
+            self.show_game_frame,
+            self.set_loaded_game,
+            self.get_game_state,
+            self.create_button
+        )
         self.build_start_screen()
         self.build_country_screen()
         self.build_game_screen()
@@ -24,8 +35,6 @@ class GameGUI:
         self.build_recruiting_screen()
         self.build_pause_menu()
         self.window.bind("<Escape>", self.show_pause_menu)
-        self.build_pre_saving()
-
     # ---------- App Setup / Navigation ----------
     def create_frames(self):
         self.start_frame = tk.Frame(self.window)
@@ -81,7 +90,7 @@ class GameGUI:
         self.load_game_button = self.create_button(
             self.start_frame,
             "Load Game",
-            self.show_pre_loaded_game
+            self.save_load_ui.show_load_screen
         )
         self.exit_game_button = self.create_button(
             self.start_frame,
@@ -245,77 +254,18 @@ class GameGUI:
         pause_menu_save_button = self.create_button(
             self.pause_menu_frame,
             "Save Game",
-            self.show_pre_saved_game
+            self.save_load_ui.show_save_screen
         )
         pause_menu_load_button = self.create_button(
             self.pause_menu_frame,
             "Load Game",
-            self.show_pre_loaded_game
+            self.save_load_ui.show_load_screen
         )
         pause_menu_exit = self.create_button(
             self.pause_menu_frame,
             "Exit Game",
             self.exit_game
         )
-
-    def build_pre_saving(self):
-        self.save_name_input = tk.Entry(self.pre_save_frame)
-        self.save_name_input.pack()
-        self.save_selected_name_button = self.create_button(
-            self.pre_save_frame,
-            "Save Game",
-            self.pause_menu_save
-        )
-
-    # ---------- Save / Load ----------
-    def show_pre_loaded_game(self):
-        for widget in self.pre_load_frame.winfo_children():
-            widget.destroy()
-        saves = self.save_rep.list_saves()
-        if len(saves) == 0:
-            no_saves_explanation = tk.Label(
-                self.pre_load_frame,
-                text="You have no existing saves to load."
-            )
-            no_saves_explanation.pack()
-            go_back_button = self.create_button(
-                self.pre_load_frame,
-                "Back",
-                self.show_start_screen
-            )
-        for index, save in enumerate(saves, start=1):
-            save_id, save_name, player_country, month = save
-            button_text = f"{index}: {save_name} - {player_country} - Month {month}"
-            save_button = self.create_button(
-                self.pre_load_frame,
-                button_text,
-                lambda chosen_save_id=save_id: self.show_loaded_game(chosen_save_id)
-            )
-            delete_button = self.create_button(
-                self.pre_load_frame,
-                f"Delete save {index}",
-                lambda chosen_save_id=save_id: self.show_delete_save(chosen_save_id)
-            )
-        self.show_only_frame(self.pre_load_frame)
-
-    def show_delete_save(self, save_id):
-        self.save_rep.delete_save(save_id)
-        self.show_pre_loaded_game()
-
-    def show_pre_saved_game(self):
-        self.show_only_frame(self.pre_save_frame)
-
-    def show_loaded_game(self, save_id):
-        self.countries, self.game = self.save_rep.load_game(save_id)
-        self.refresh_display()
-        self.chosen_country_label.pack()
-        self.can_pause = True
-        self.show_only_frame(self.game_frame)
-
-    def pause_menu_save(self):
-        chosen_save_name = self.save_name_input.get()
-        self.save_rep.save_game(chosen_save_name, self.game, self.countries)
-        self.show_only_frame(self.game_frame)
 
     def show_pause_menu(self, event=None):
         if not self.can_pause:
@@ -324,6 +274,19 @@ class GameGUI:
 
     def continue_game_from_pause_menu(self):
         self.show_only_frame(self.game_frame)
+
+    def show_game_frame(self):
+        self.refresh_display()
+        self.chosen_country_label.pack()
+        self.can_pause = True
+        self.show_only_frame(self.game_frame)
+
+    def set_loaded_game(self, loaded_game, loaded_countries):
+        self.game = loaded_game
+        self.countries = loaded_countries
+
+    def get_game_state(self):
+        return self.game, self.countries
 
     # ---------- Month Flow ----------
     def next_month(self):
