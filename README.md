@@ -24,18 +24,31 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Duplicate save names are automatically renamed with `_2`, `_3`, etc.
 - Save slots can be deleted from the GUI
 - Automated tests with `unittest`
+- GitHub Actions workflow that automatically runs tests on GitHub
+
+## Engineering Highlights
+
+- Modular Python project split across backend systems, GUI coordinator code, and focused GUI helper modules
+- GUI helper package for save/load, recruitment, events, and advisor selection screens
+- SQLite persistence layer with save slots, country rows, duplicate save-name handling, load support, and delete support
+- Backend/game logic is tested separately from the Tkinter GUI
+- `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
+- GitHub Actions CI runs the automated test suite after pushes and pull requests
+- Legacy JSON save files were replaced by the SQLite save system
+- README, Git history, and GitHub repo are maintained as part of the project workflow
 
 ## Project Structure
 
 - `main.py` - starts the GUI application
-- `gui_app.py` - main GUI application and Tkinter screens
-- `save_load_ui.py` - save/load GUI screens and save-slot buttons
+- `gui_app.py` - main GUI coordinator and shared Tkinter navigation
+- `gui_helpers/` - focused GUI helper modules for save/load, recruitment, events, and advisors
 - `game.py` - core game state and month progression
 - `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
 - `battle.py` - battle resolution logic
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
 - `test_game.py` - automated tests
+- `.github/workflows/tests.yml` - GitHub Actions workflow that runs tests after pushes and pull requests
 
 ## Running the Game
 
@@ -50,6 +63,8 @@ python main.py
 ```powershell
 python -m unittest -v
 ```
+
+GitHub Actions also runs the test suite automatically when code is pushed to GitHub.
 
 ## Save System
 
@@ -101,3 +116,4 @@ This project helped me learn:
 - Automated tests with `unittest`
 - Separating user interface code from backend logic
 - Git and GitHub version control
+- GitHub Actions for automatic test runs
