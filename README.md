@@ -25,6 +25,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Save slots can be deleted from the GUI
 - Automated tests with `unittest`
 - GitHub Actions workflow that automatically runs tests on GitHub
+- Ruff static analysis for code quality checks
 
 ## Engineering Highlights
 
@@ -34,6 +35,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Backend/game logic is tested separately from the Tkinter GUI
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
+- Ruff checks the active project code for unused imports, unused variables, and common Python style issues
 - Legacy JSON save files were replaced by the SQLite save system
 - README, Git history, and GitHub repo are maintained as part of the project workflow
 
@@ -48,6 +50,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
 - `test_game.py` - automated tests
+- `pyproject.toml` - Ruff configuration for static code checks
 - `.github/workflows/tests.yml` - GitHub Actions workflow that runs tests after pushes and pull requests
 
 ## Running the Game
@@ -65,6 +68,14 @@ python -m unittest -v
 ```
 
 GitHub Actions also runs the test suite automatically when code is pushed to GitHub.
+
+## Running Code Quality Checks
+
+```powershell
+python -m ruff check .
+```
+
+Ruff checks the active project code for unused imports, unused variables, and common Python style issues. The legacy folder is excluded from Ruff checks.
 
 ## Save System
 
@@ -114,6 +125,7 @@ This project helped me learn:
 - Turning database rows back into Python objects
 - Input validation and exception handling
 - Automated tests with `unittest`
+- Static analysis and linting with Ruff
 - Separating user interface code from backend logic
 - Git and GitHub version control
 - GitHub Actions for automatic test runs
