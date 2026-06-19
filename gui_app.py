@@ -180,22 +180,22 @@ class GameGUI:
         )
 
     def build_pause_menu(self, event=None):
-        pause_menu_continue_button = self.create_button(
+        self.create_button(
             self.pause_menu_frame,
             "Continue",
             self.continue_game_from_pause_menu
         )
-        pause_menu_save_button = self.create_button(
+        self.create_button(
             self.pause_menu_frame,
             "Save Game",
             self.save_load_ui.show_save_screen
         )
-        pause_menu_load_button = self.create_button(
+        self.create_button(
             self.pause_menu_frame,
             "Load Game",
             self.save_load_ui.show_load_screen
         )
-        pause_menu_exit = self.create_button(
+        self.create_button(
             self.pause_menu_frame,
             "Exit Game",
             self.exit_game

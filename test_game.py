@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 from country import Country
 from battle import Battle
 from game import Game
@@ -147,7 +146,6 @@ class GameFileTests(unittest.TestCase):
         self.assertEqual(self.weaker_country.ducats, 76)
         self.assertEqual(self.stronger_country.ducats, 192)
     def test_event(self):
-        test_save = Game()
         event_sys = EventSystem()
         # Ducats of stronger country needs to be reduced by 50 ducats and the income raised by 2.
         old_ducats = self.stronger_country.ducats
