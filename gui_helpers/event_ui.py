@@ -19,7 +19,7 @@ class EventUI:
         self.get_player_country = get_player_country
         self.refresh_display = refresh_display
         self.set_can_pause = set_can_pause
-
+        self.build_event_screen()
     def build_event_screen(self):
         self.event_text = tk.Label(
             self.event_frame,

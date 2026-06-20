@@ -6,6 +6,9 @@ from gui_helpers.save_load_ui import SaveLoadUI
 from gui_helpers.recruitment_ui import RecruitmentUI
 from gui_helpers.event_ui import EventUI
 from gui_helpers.advisor_ui import AdvisorUI
+from country import Country
+from collections.abc import Callable
+
 class GameGUI:
     def __init__(self, game, countries):
         self.save_rep = SaveRepository()
@@ -15,6 +18,7 @@ class GameGUI:
         self.window = tk.Tk()
         self.window.title("Python EU4 Simulator")
         self.window.geometry("600x400")
+        self.first_time_game_frame_shown = True
         self.can_pause = False
         self.create_frames()
         self.save_load_ui = SaveLoadUI(
@@ -53,16 +57,13 @@ class GameGUI:
             self.show_game_screen,
             self.set_can_pause
         )
-        self.recruitment_ui.build_recruiting_screen()
-        self.advisor_ui.build_advisor_screen()
         self.build_start_screen()
         self.build_country_screen()
         self.build_game_screen()
-        self.event_ui.build_event_screen()
         self.build_pause_menu()
         self.window.bind("<Escape>", self.show_pause_menu)
     # ---------- App Setup / Navigation ----------
-    def set_can_pause(self, value):
+    def set_can_pause(self, value: bool) -> None:
         self.can_pause = value
     def create_frames(self):
         self.start_frame = tk.Frame(self.window)
@@ -86,26 +87,26 @@ class GameGUI:
             self.pre_save_frame
         ]
 
-    def create_button(self, frame, text, command):
+    def create_button(self, frame: tk.Frame, text: str, command: Callable[[], None]) -> tk.Button:
         button = tk.Button(frame, text=text, command=command)
         button.pack()
         return button
 
-    def show_only_frame(self, frame_to_show):
+    def show_only_frame(self, frame_to_show: tk.Frame) -> None:
         for frame in self.frames:
             frame.pack_forget()
         frame_to_show.pack()
 
-    def show_start_screen(self):
+    def show_start_screen(self) -> None:
         self.show_only_frame(self.start_frame)
 
-    def start_new_game(self):
+    def start_new_game(self) -> None:
         self.show_only_frame(self.country_selection_frame)
 
-    def exit_game(self):
+    def exit_game(self) -> None:
         self.window.destroy()
 
-    def run(self):
+    def run(self) -> None:
         self.window.mainloop()
 
     # ---------- Screen Builders ----------
@@ -147,32 +148,12 @@ class GameGUI:
             self.game_frame,
             text=f"You are playing as {self.game.picked_country_name}"
         )
-        self.first_country_ducats = tk.Label(
-            self.game_frame,
-            text=f"{self.countries[0].name} has {self.countries[0].ducats:.2f} ducats"
-        )
-        self.second_country_ducats = tk.Label(
-            self.game_frame,
-            text=f"{self.countries[1].name} has {self.countries[1].ducats:.2f} ducats"
-        )
-        self.first_country_troops_label = tk.Label(
-            self.game_frame,
-            text=f"{self.countries[0].name} has {self.countries[0].troops} troops"
-        )
-        self.second_country_troops_label = tk.Label(
-            self.game_frame,
-            text=f"{self.countries[1].name} has {self.countries[1].troops} troops"
-        )
         self.title_label = tk.Label(
             self.game_frame,
             text="Python EU4 Simulator"
         )
         self.title_label.pack()
         self.month_label.pack()
-        self.first_country_ducats.pack()
-        self.second_country_ducats.pack()
-        self.first_country_troops_label.pack()
-        self.second_country_troops_label.pack()
         self.next_month_button = self.create_button(
             self.game_frame,
             "Next Month",
@@ -208,14 +189,13 @@ class GameGUI:
 
     def continue_game_from_pause_menu(self):
         self.show_only_frame(self.game_frame)
-
     def show_game_frame(self):
         self.refresh_display()
         self.chosen_country_label.pack()
         self.can_pause = True
         self.show_only_frame(self.game_frame)
 
-    def set_loaded_game(self, loaded_game, loaded_countries):
+    def set_loaded_game(self, loaded_game, loaded_countries: list[Country]) -> None:
         self.game = loaded_game
         self.countries = loaded_countries
         self.advisor_ui.set_game(loaded_game)
@@ -224,7 +204,7 @@ class GameGUI:
         return self.game, self.countries
 
     # ---------- Month Flow ----------
-    def next_month(self):
+    def next_month(self) -> None:
         self.game.advance_month(self.countries)
         self.refresh_display()
         month_status = self.game.get_month_action()
@@ -235,7 +215,7 @@ class GameGUI:
     # ---------- Events ----------
 
     # ---------- Country / Advisors ----------
-    def select_country(self, country_name):
+    def select_country(self, country_name: str) -> None:
         self.game.picked_country_name = country_name
         self.country_confirmation_label.config(
             text=f"You have chosen {country_name}"
@@ -243,34 +223,41 @@ class GameGUI:
         self.country_confirmation_label.pack()
         self.window.after(500, self.advisor_ui.show_advisor_screen)
 
-    def show_game_screen(self):
+    def show_game_screen(self) -> None:
         self.chosen_country_label.config(
             text=f"You are playing as {self.game.picked_country_name}"
         )
         self.chosen_country_label.pack()
+        if self.first_time_game_frame_shown:
+            self.build_country_reports()
+        self.first_time_game_frame_shown = False
         self.show_only_frame(self.game_frame)
         self.can_pause = True
-
+    def build_country_reports(self) -> None:
+        for country in self.countries:
+            ducats_report = tk.Label(
+                self.game_frame,
+                text = f"{country.name} has {country.ducats:.2f} ducats"
+            )
+            troops_report = tk.Label(
+                self.game_frame,
+                text=f"{country.name} has {country.troops} troops"
+            )
+            ducats_report.pack()
+            troops_report.pack()        
     # ---------- Display / Helpers ----------
-    def get_player_country(self):
+    def get_player_country(self) -> Country | None:
         for country in self.countries:
             if country.name == self.game.picked_country_name:
                 return country
-
-    def refresh_display(self):
+        return None
+    def refresh_display(self) -> None:
+        for widget in self.game_frame.winfo_children():
+            widget.destroy()
+        self.build_game_screen()
         self.month_label.config(text=f"Month: {self.game.months_passed}")
         self.chosen_country_label.config(
             text=f"You are playing as {self.game.picked_country_name}"
         )
-        self.first_country_ducats.config(
-            text=f"{self.countries[0].name} has {self.countries[0].ducats:.2f} ducats"
-        )
-        self.second_country_ducats.config(
-            text=f"{self.countries[1].name} has {self.countries[1].ducats:.2f} ducats"
-        )
-        self.first_country_troops_label.config(
-            text=f"{self.countries[0].name} has {self.countries[0].troops} troops"
-        )
-        self.second_country_troops_label.config(
-            text=f"{self.countries[1].name} has {self.countries[1].troops} troops"
-        )
+        self.chosen_country_label.pack()
+        self.build_country_reports()

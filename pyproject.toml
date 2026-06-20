@@ -1,2 +1,5 @@
 [tool.ruff]
 exclude = ["legacy"]
+[tool.mypy]
+exclude = ["legacy/"]
+check_untyped_defs = true

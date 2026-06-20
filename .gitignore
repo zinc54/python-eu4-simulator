@@ -3,3 +3,4 @@ __pycache__/
 practice.db
 database_practice.py
 eu4_saves.db
+.venv/

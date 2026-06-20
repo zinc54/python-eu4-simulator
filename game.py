@@ -12,6 +12,7 @@ class Game:
             2: 4,
             3: 9
         }
+        self.picked_country_name: str = ""
     def get_month_action(self):
         if self.months_passed % 12 == 0:
             return "event"

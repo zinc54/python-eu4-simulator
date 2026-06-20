@@ -1,6 +1,10 @@
 import tkinter as tk
 
 class AdvisorUI:
+    military_advisor_level: tk.StringVar
+    diplomatic_advisor_level: tk.StringVar
+    administrative_advisor_level: tk.StringVar
+    advisor_cost_label: tk.Label
     def __init__(
         self,
         advisor_selection_frame,
@@ -14,7 +18,8 @@ class AdvisorUI:
         self.show_only_frame = show_only_frame
         self.show_game_screen = show_game_screen
         self.set_can_pause = set_can_pause
-
+        self.build_advisor_screen()
+        
     def set_game(self, game):
         self.game = game
 
@@ -23,9 +28,9 @@ class AdvisorUI:
         self.show_only_frame(self.advisor_selection_frame)
 
     def update_advisor_cost(self, selected_level=None):
-        military_level = self.military_advisor_level.get()
-        diplomatic_level = self.diplomatic_advisor_level.get()
-        administrative_level = self.administrative_advisor_level.get()
+        military_level = int(self.military_advisor_level.get())
+        diplomatic_level = int(self.diplomatic_advisor_level.get())
+        administrative_level = int(self.administrative_advisor_level.get())
         mil_advisor_cost = self.game.advisor_costs[military_level]
         dip_advisor_cost = self.game.advisor_costs[diplomatic_level]
         admin_advisor_cost = self.game.advisor_costs[administrative_level]
@@ -46,25 +51,25 @@ class AdvisorUI:
             text="Continue.",
             command=self.finish_advisor_selection
         )
-        self.military_advisor_level = tk.IntVar(value=0)
-        self.diplomatic_advisor_level = tk.IntVar(value=0)
-        self.administrative_advisor_level = tk.IntVar(value=0)
+        self.military_advisor_level = tk.StringVar(value="0")
+        self.diplomatic_advisor_level = tk.StringVar(value="0")
+        self.administrative_advisor_level = tk.StringVar(value="0")
         self.military_dropdown = tk.OptionMenu(
             self.advisor_selection_frame,
             self.military_advisor_level,
-            0, 1, 2, 3,
+            "0", "1", "2", "3",
             command=self.update_advisor_cost
         )
         self.diplomatic_dropdown = tk.OptionMenu(
             self.advisor_selection_frame,
             self.diplomatic_advisor_level,
-            0, 1, 2, 3,
+            "0", "1", "2", "3",
             command=self.update_advisor_cost
         )
         self.administrative_dropdown = tk.OptionMenu(
             self.advisor_selection_frame,
             self.administrative_advisor_level,
-            0, 1, 2, 3,
+            "0", "1", "2", "3",
             command=self.update_advisor_cost
         )
         self.advisor_cost_label = tk.Label(

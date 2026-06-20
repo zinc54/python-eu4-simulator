@@ -17,6 +17,7 @@ class RecruitmentUI:
         self.refresh_display = refresh_display
         self.create_button = create_button
         self.set_can_pause = set_can_pause
+        self.build_recruiting_screen()
     def build_recruiting_screen(self):
         self.recruitment_question = tk.Label(
             self.recruitment_frame,

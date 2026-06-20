@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from typing import cast
 @dataclass
 class Country:
     name: str
@@ -40,7 +40,8 @@ class Country:
         morale_percentage = self.morale / max_morale
         levels_above_base = self.technology["mil"] - 3
         tech_damage_buff = 1 + (levels_above_base * 0.25)
-        damage = self.troops * self.discipline * morale_percentage * tech_damage_buff
+        discipline = cast(float, self.discipline)
+        damage = self.troops * discipline  * morale_percentage * tech_damage_buff
         return damage
 
     def process_monthly_economy(self, advisor_costs, picked_country_name):

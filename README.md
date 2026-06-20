@@ -26,6 +26,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Automated tests with `unittest`
 - GitHub Actions workflow that automatically runs tests on GitHub
 - Ruff static analysis for code quality checks
+- Mypy static type checking across the active Python modules
+- Dynamic country reports that support any number of loaded countries
 
 ## Engineering Highlights
 
@@ -36,6 +38,11 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
+- Mypy checks annotated and unannotated method bodies for incompatible types and missing attributes
+- Event consequence dictionaries use `TypedDict` to document and verify their nested structure
+- GUI helper classes construct their own widgets during initialization, reducing invalid setup states
+- Country displays are generated from the country collection instead of fixed list indexes
+- A project-local virtual environment isolates development tools from global Python packages
 - Legacy JSON save files were replaced by the SQLite save system
 - README, Git history, and GitHub repo are maintained as part of the project workflow
 
@@ -50,7 +57,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
 - `test_game.py` - automated tests
-- `pyproject.toml` - Ruff configuration for static code checks
+- `pyproject.toml` - Ruff and mypy configuration for static code checks
 - `.github/workflows/tests.yml` - GitHub Actions workflow that runs tests after pushes and pull requests
 
 ## Running the Game
@@ -60,6 +67,18 @@ Run the GUI version:
 ```powershell
 python main.py
 ```
+
+## Development Environment
+
+Create and activate the project virtual environment on Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install ruff mypy
+```
+
+The generated `.venv/` directory is ignored by Git.
 
 ## Running the Tests
 
@@ -73,9 +92,10 @@ GitHub Actions also runs the test suite automatically when code is pushed to Git
 
 ```powershell
 python -m ruff check .
+python -m mypy .
 ```
 
-Ruff checks the active project code for unused imports, unused variables, and common Python style issues. The legacy folder is excluded from Ruff checks.
+Ruff checks the active project code for unused imports, unused variables, and common Python style issues. Mypy checks type annotations and method bodies across the active modules. The legacy folder is excluded from both tools.
 
 ## Save System
 
@@ -126,6 +146,10 @@ This project helped me learn:
 - Input validation and exception handling
 - Automated tests with `unittest`
 - Static analysis and linting with Ruff
+- Static type checking with mypy
+- Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`
+- Virtual environments for isolated project dependencies
+- Designing collection-based displays without fixed list indexes
 - Separating user interface code from backend logic
 - Git and GitHub version control
 - GitHub Actions for automatic test runs

@@ -1,8 +1,13 @@
 import random
+from typing import TypedDict
 
-class EventSystem:
+class EventConsequence(TypedDict):
+    description: str
+    effects: dict[str, int]
+
+class EventSystem():
     def __init__(self):
-        self.event_consequences = {
+        self.event_consequences: dict[str, EventConsequence] = {
                             "We are blessed!": {
                                 "description": "Gain 100 ducats",
                                 "effects": {
