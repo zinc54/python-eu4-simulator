@@ -18,6 +18,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Loans, interest, and bankruptcy logic
 - Random event system with choice consequences
 - Battle damage calculations
+- Clickable map screen with country regions
+- Map-based battle launching and battle result popup
 - Pause menu with save/load/exit options
 - SQLite save/load system with multiple save slots
 - Dynamic load screen that creates one button per save
@@ -54,6 +56,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `game.py` - core game state and month progression
 - `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
 - `battle.py` - battle resolution logic
+- `map_ui.py` - clickable Tkinter canvas map and battle result popup
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
 - `test_game.py` - automated tests
@@ -127,8 +130,8 @@ Future cleanup goals:
 - Add stronger save-name validation
 - Continue separating GUI code from backend game logic
 - Continue splitting large GUI sections into focused UI modules
-- Split large GUI sections into smaller modules when the boundaries are clear
 - Polish the GUI layout and user feedback
+- Expand the map system beyond the first prototype regions
 
 ## What I Learned
 
@@ -139,6 +142,8 @@ This project helped me learn:
 - Splitting a program into multiple modules
 - GUI programming with Tkinter
 - Buttons, frames, labels, entries, callbacks, and dynamic widgets
+- Tkinter Canvas basics for drawing clickable map regions
+- Tkinter popup windows with `Toplevel`
 - JSON saving and loading
 - SQLite databases
 - SQL tables, rows, primary keys, foreign keys, `SELECT`, `INSERT`, `UPDATE`, and `DELETE`

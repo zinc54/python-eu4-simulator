@@ -114,6 +114,15 @@ class BattleTests(unittest.TestCase):
         self.assertAlmostEqual(weak_morale_before - self.weaker_country.morale, 1)
         self.assertAlmostEqual(weak_troops_before - self.weaker_country.troops, 6600)
         self.assertAlmostEqual(strong_troops_before - self.stronger_country.troops, 8000 / 30)
+    def test_battles_below_zero(self):
+        zero_test_weak_country = self.weaker_country
+        zero_test_strong_country = self.stronger_country
+        zero_test_weak_country.troops = -5000
+        zero_test_weak_country.morale = -4
+        zero_test_battle = Battle(zero_test_weak_country, zero_test_strong_country)
+        zero_test_battle.resolve_battle()
+        self.assertGreaterEqual(zero_test_weak_country.troops, 0)
+        self.assertGreaterEqual(zero_test_weak_country.morale, 0)
 class GameFileTests(unittest.TestCase):
     def setUp(self):
         self.weaker_country = Country(

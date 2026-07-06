@@ -8,6 +8,7 @@ from gui_helpers.event_ui import EventUI
 from gui_helpers.advisor_ui import AdvisorUI
 from country import Country
 from collections.abc import Callable
+from map_ui import MapUI
 
 class GameGUI:
     def __init__(self, game, countries):
@@ -21,6 +22,12 @@ class GameGUI:
         self.first_time_game_frame_shown = True
         self.can_pause = False
         self.create_frames()
+        self.map_ui = MapUI(
+            self.map_frame,
+            self.game,
+            self.countries,
+            self.show_game_frame,
+        )
         self.save_load_ui = SaveLoadUI(
             self.save_rep,
             self.pre_load_frame,
@@ -75,6 +82,7 @@ class GameGUI:
         self.pause_menu_frame = tk.Frame(self.window)
         self.pre_load_frame = tk.Frame(self.window)
         self.pre_save_frame = tk.Frame(self.window)
+        self.map_frame = tk.Frame(self.window)
         self.frames = [
             self.start_frame,
             self.game_frame,
@@ -84,7 +92,8 @@ class GameGUI:
             self.recruitment_frame,
             self.pause_menu_frame,
             self.pre_load_frame,
-            self.pre_save_frame
+            self.pre_save_frame,
+            self.map_frame,
         ]
 
     def create_button(self, frame: tk.Frame, text: str, command: Callable[[], None]) -> tk.Button:
@@ -159,7 +168,14 @@ class GameGUI:
             "Next Month",
             self.next_month
         )
-
+        self.open_map_button = self.create_button(
+            self.game_frame,
+            "Open Map",
+            self.show_map_screen
+        )
+    def show_map_screen(self):
+        self.map_ui.refresh_map_display()
+        self.show_only_frame(self.map_frame)
     def build_pause_menu(self, event=None):
         self.create_button(
             self.pause_menu_frame,
@@ -212,8 +228,6 @@ class GameGUI:
             self.event_ui.show_event_screen()
         elif month_status == "recruitment":
             self.recruitment_ui.show_recruitment_screen()
-    # ---------- Events ----------
-
     # ---------- Country / Advisors ----------
     def select_country(self, country_name: str) -> None:
         self.game.picked_country_name = country_name
@@ -241,7 +255,7 @@ class GameGUI:
             )
             troops_report = tk.Label(
                 self.game_frame,
-                text=f"{country.name} has {country.troops} troops"
+                text=f"{country.name} has {country.troops:.0f} troops"
             )
             ducats_report.pack()
             troops_report.pack()        

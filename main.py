@@ -24,7 +24,7 @@ def main():
     countries = [weaker_country, stronger_country]
 
     game = Game()
-    game.picked_country_name = "StrongCountry"
+    game.picked_country_name = ""
     game.monthly_advisor_expenses = 0
     gui = GameGUI(game, countries)
     gui.run()
