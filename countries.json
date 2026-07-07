@@ -1,0 +1,38 @@
+{
+    "map_data": {
+        "France": {
+            "x1": 100,
+            "y1": 100,
+            "x2": 250,
+            "y2": 250,
+            "color": "blue"
+        },
+        "Ottomans": {
+            "x1": 350,
+            "y1": 100,
+            "x2": 500,
+            "y2": 250,
+            "color": "red"
+        }
+    },
+    "country_data": {
+        "Ottomans": {
+            "name": "Ottomans",
+            "morale": 5.0,
+            "discipline": "110%",
+            "troops": 40000,
+            "technology": {"mil": 5, "dip": 3, "admin": 3},
+            "ducats": 700,
+            "income": 0
+        },
+        "France": {
+            "name": "France",
+            "morale": 4.0,
+            "discipline": "100%",
+            "troops": 10000,
+            "technology": {"mil": 3, "dip": 3, "admin": 3},
+            "ducats": 200,
+            "income": 0
+        }
+    }
+}

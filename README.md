@@ -20,6 +20,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Battle damage calculations
 - Clickable map screen with country regions
 - Map-based battle launching and battle result popup
+- Country and map setup loaded from `countries.json`
 - Pause menu with save/load/exit options
 - SQLite save/load system with multiple save slots
 - Dynamic load screen that creates one button per save
@@ -30,10 +31,14 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Ruff static analysis for code quality checks
 - Mypy static type checking across the active Python modules
 - Dynamic country reports that support any number of loaded countries
+- Data-driven country setup so new countries can be added by editing configuration data
 
 ## Engineering Highlights
 
 - Modular Python project split across backend systems, GUI coordinator code, and focused GUI helper modules
+- Country and map startup data is loaded through a dedicated loader instead of being hardcoded in `main.py`
+- `countries.json` separates gameplay stats from map drawing data
+- Startup data validation catches missing country/map configuration before the GUI launches
 - GUI helper package for save/load, recruitment, events, and advisor selection screens
 - SQLite persistence layer with save slots, country rows, duplicate save-name handling, load support, and delete support
 - Backend/game logic is tested separately from the Tkinter GUI
@@ -55,6 +60,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `gui_helpers/` - focused GUI helper modules for save/load, recruitment, events, and advisors
 - `game.py` - core game state and month progression
 - `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
+- `country_data_loader.py` - loads and validates country/map setup data from JSON
+- `countries.json` - data-driven country stats and map region configuration
 - `battle.py` - battle resolution logic
 - `map_ui.py` - clickable Tkinter canvas map and battle result popup
 - `event_system.py` - random events and their effects
@@ -128,6 +135,7 @@ The current main version is the GUI + SQLite version.
 Future cleanup goals:
 
 - Add stronger save-name validation
+- Continue expanding data-driven country/map configuration
 - Continue separating GUI code from backend game logic
 - Continue splitting large GUI sections into focused UI modules
 - Polish the GUI layout and user feedback
@@ -145,6 +153,8 @@ This project helped me learn:
 - Tkinter Canvas basics for drawing clickable map regions
 - Tkinter popup windows with `Toplevel`
 - JSON saving and loading
+- Data-driven configuration with JSON
+- Validating configuration data before the app starts
 - SQLite databases
 - SQL tables, rows, primary keys, foreign keys, `SELECT`, `INSERT`, `UPDATE`, and `DELETE`
 - Turning database rows back into Python objects

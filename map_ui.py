@@ -1,12 +1,26 @@
 import tkinter as tk
+from collections.abc import Callable
+from typing import TypedDict
+
 from battle import Battle
 
+
+class CountryMapData(TypedDict):
+    x1: int
+    y1: int
+    x2: int
+    y2: int
+    color: str
+
+
 class MapUI:
-    def __init__(self, parent_frame, game, countries, show_game_screen):
+    def __init__(self, parent_frame, game, countries, show_game_screen, map_data):
         self.parent_frame = parent_frame
         self.game = game
         self.countries = countries
         self.show_game_screen = show_game_screen
+        self.map_data = map_data
+        self.selected_country_name = ""
         self.canvas = tk.Canvas(
             self.parent_frame,
             width=600,
@@ -34,6 +48,12 @@ class MapUI:
             self.selection_text,
             text=selection_message
         )
+    def create_country_click_handler(self, country_name: str) -> Callable[[tk.Event], None]:
+        def handle_country_click(event: tk.Event) -> None:
+            self.select_country(country_name)
+
+        return handle_country_click
+
     def show_battle_result(self, result):
         result_window = tk.Toplevel(self.parent_frame)
         result_window.title("Battle Results")
@@ -116,11 +136,19 @@ class MapUI:
 
         
     def start_battle(self):
+        attacker = None
+        defender = None
         for country in self.countries:
             if country.name == self.game.picked_country_name:
                 attacker = country
             elif country.name == self.selected_country_name:
                 defender = country
+        if attacker is None or defender is None:
+            self.canvas.itemconfig(
+                self.selection_text,
+                text="Pick an enemy country before starting a battle.",
+            )
+            return
         started_battle = Battle(attacker, defender)
         battle_result_info = started_battle.resolve_battle()
         self.show_battle_result(battle_result_info)
@@ -133,6 +161,7 @@ class MapUI:
             self.battle_button_window,
             state="hidden",
         )
+
     def build_map(self):
         self.battle_button = tk.Button(
             self.canvas,
@@ -163,38 +192,32 @@ class MapUI:
             anchor="nw",
             font=("Arial", 12, "bold"),
         )
-        self.canvas.create_rectangle(
-            100, 100, 250, 250,
-            fill="blue",
-            tags="France"
-        )
-        self.canvas.create_rectangle(
-            350, 100, 500, 250,
-            fill="red",
-            tags="Ottomans",
-        )
-        self.canvas.create_text(
-            175, 175,
-            text="France",
-            fill="white",
-            font=("Arial", 16, "bold"),
-            tags="France",
-        )
+        for country in self.countries:
+            map_data = self.map_data[country.name]
 
-        self.canvas.create_text(
-            425, 175,
-            text="Ottomans",
-            fill="white",
-            font=("Arial", 16, "bold"),
-            tags="Ottomans"
-        )
-        self.canvas.tag_bind(
-            "France",
-            "<Button-1>",
-            lambda event: self.select_country("France"),
-        )
-        self.canvas.tag_bind(
-            "Ottomans",
-            "<Button-1>",
-            lambda event: self.select_country("Ottomans"),
-        )
+            self.canvas.create_rectangle(
+                map_data["x1"],
+                map_data["y1"],
+                map_data["x2"],
+                map_data["y2"],
+                fill=map_data["color"],
+                tags=country.name
+            )
+
+            center_x = (map_data["x1"] + map_data["x2"]) / 2
+            center_y = (map_data["y1"] + map_data["y2"]) / 2
+
+            self.canvas.create_text(
+                center_x,
+                center_y,
+                text=country.name,
+                fill="white",
+                font=("Arial", 16, "bold"),
+                tags=country.name,
+            )
+
+            self.canvas.tag_bind(
+                country.name,
+                "<Button-1>",
+                self.create_country_click_handler(country.name),
+            )

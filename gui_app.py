@@ -11,11 +11,12 @@ from collections.abc import Callable
 from map_ui import MapUI
 
 class GameGUI:
-    def __init__(self, game, countries):
+    def __init__(self, game, countries, map_data):
         self.save_rep = SaveRepository()
         self.game = game
         self.event_sys = EventSystem()
         self.countries = countries
+        self.map_data = map_data
         self.window = tk.Tk()
         self.window.title("Python EU4 Simulator")
         self.window.geometry("600x400")
@@ -27,6 +28,7 @@ class GameGUI:
             self.game,
             self.countries,
             self.show_game_frame,
+            self.map_data,
         )
         self.save_load_ui = SaveLoadUI(
             self.save_rep,
@@ -215,7 +217,15 @@ class GameGUI:
         self.game = loaded_game
         self.countries = loaded_countries
         self.advisor_ui.set_game(loaded_game)
-
+        for widget in self.map_frame.winfo_children():
+            widget.destroy()
+        self.map_ui = MapUI(
+            self.map_frame,
+            self.game,
+            self.countries,
+            self.show_game_frame,
+            self.map_data,
+        )
     def get_game_state(self):
         return self.game, self.countries
 
