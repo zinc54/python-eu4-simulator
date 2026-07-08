@@ -2,8 +2,8 @@ import json
 from country import Country
 
 class CountryDataLoader():
-    def __init__(self):
-        with open("countries.json", "r") as file:
+    def __init__(self, filename="countries.json"):
+        with open(filename, "r") as file:
             self.data = json.load(file)
         self.validate_country_data()
         self.validate_map_data()
@@ -27,9 +27,10 @@ class CountryDataLoader():
                     raise ValueError(f"{country_name} is missing {key}")
     def validate_map_data(self):
         required_map_keys = ["x1", "y1", "x2", "y2", "color"]
-        for country_name in self.data["country_data"]:
+        for country_name in self.data["map_data"]:
             if country_name not in self.data["country_data"]:
                 raise ValueError(f"{country_name} has map_data but no country_data")
+        for country_name in self.data["country_data"]:
             if country_name not in self.data["map_data"]:
                 raise ValueError(f"{country_name} is missing map_data")
         for country_name, country_map_data in self.data["map_data"].items():
@@ -38,16 +39,18 @@ class CountryDataLoader():
                     raise ValueError(f"{country_name} doesn't have the {key} in its map_data")
     def load_countries_data(self):
         countries_data_list = []
-        for country in self.data["country_data"]:
+        for country_name, country_data in self.data["country_data"].items():
+            if country_data["name"] != country_name:
+                raise ValueError(f"{country_name} has mismatched name field")
             country_object = Country(
-                self.data["country_data"][country]["name"],
-                self.data["country_data"][country]["morale"],
-                self.data["country_data"][country]["discipline"],
-                self.data["country_data"][country]["troops"],
-                self.data["country_data"][country]["technology"],
-                self.data["country_data"][country]["ducats"],
-                self.data["country_data"][country]["income"]
-                )
+                country_name,
+                country_data["morale"],
+                country_data["discipline"],
+                country_data["troops"],
+                country_data["technology"],
+                country_data["ducats"],
+                country_data["income"],
+            )
             countries_data_list.append(country_object)
         map_data = self.data["map_data"]
         return countries_data_list, map_data

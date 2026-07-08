@@ -42,6 +42,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - GUI helper package for save/load, recruitment, events, and advisor selection screens
 - SQLite persistence layer with save slots, country rows, duplicate save-name handling, load support, and delete support
 - Backend/game logic is tested separately from the Tkinter GUI
+- Country-data tests use isolated temporary JSON files instead of modifying the real configuration
+- Loader tests cover valid data, missing required fields, and mismatched country/map entries
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -160,6 +162,8 @@ This project helped me learn:
 - Turning database rows back into Python objects
 - Input validation and exception handling
 - Automated tests with `unittest`
+- Testing expected exceptions with `assertRaises`
+- Creating and automatically cleaning up temporary test files
 - Static analysis and linting with Ruff
 - Static type checking with mypy
 - Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`

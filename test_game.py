@@ -1,9 +1,13 @@
 import unittest
+import os
 from country import Country
 from battle import Battle
 from game import Game
 from event_system import EventSystem
 from save_repository import SaveRepository
+from country_data_loader import CountryDataLoader
+import json
+import tempfile
 
 class CountryTests(unittest.TestCase):
     def test_discipline_conversion(self):
@@ -205,5 +209,96 @@ class GameFileTests(unittest.TestCase):
 
         game.months_passed = 7
         self.assertEqual(game.get_month_action(), "continue")
+    def test_valid_data_loads_correctly(self):
+        test_data = {
+            "country_data": {
+                "Testland": {
+                    "name": "Testland",
+                    "morale": 4.0,
+                    "discipline": "100%",
+                    "troops": 10000,
+                    "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "ducats": 200,
+                    "income": 0,
+                }
+            },
+            "map_data": {
+                "Testland": {
+                    "x1": 100,
+                    "y1": 100,
+                    "x2": 200,
+                    "y2": 200,
+                    "color": "blue",
+                }
+            },
+        }
+        with tempfile.NamedTemporaryFile("w", delete=False) as test_file:
+            json.dump(test_data, test_file)
+            test_filename = test_file.name
+        self.addCleanup(os.unlink, test_filename)
+        loader = CountryDataLoader(test_filename)
+        country_data, map_data = loader.load_countries_data()
+        self.assertEqual(len(country_data), 1)
+        self.assertEqual(country_data[0].name, "Testland")
+        self.assertEqual(country_data[0].troops, 10000)
+        self.assertEqual(map_data["Testland"]["color"], "blue")
+    def test_missing_required_field_raises(self):
+        missing_field_test_data = {
+            "country_data": {
+                "Testland": {
+                    "name": "Testland",
+                    "morale": 4.0,
+                    "troops": 10000,
+                    "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "ducats": 200,
+                    "income": 0,
+                }
+            },
+            "map_data": {
+                "Testland": {
+                    "x1": 100,
+                    "y1": 100,
+                    "x2": 200,
+                    "y2": 200,
+                    "color": "blue",
+                }
+            },
+        }
+        with tempfile.NamedTemporaryFile("w", delete=False) as test_file_two:
+            json.dump(missing_field_test_data, test_file_two)
+            test_filename = test_file_two.name
+        self.addCleanup(os.unlink, test_filename)
+
+        with self.assertRaises(ValueError):
+            CountryDataLoader(test_filename)
+    def test_map_data_country_mismatch_raises(self):
+        name_mismatch_test_data = {
+            "country_data": {
+                "Testland": {
+                    "name": "Testland",
+                    "morale": 4.0,
+                    "discipline": "100%",
+                    "troops": 10000,
+                    "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "ducats": 200,
+                    "income": 0,
+                }
+            },
+            "map_data": {
+                "Otherland": {
+                    "x1": 100,
+                    "y1": 100,
+                    "x2": 200,
+                    "y2": 200,
+                    "color": "blue",
+                }
+            },
+        }
+        with tempfile.NamedTemporaryFile("w", delete=False) as test_file_three:
+            json.dump(name_mismatch_test_data, test_file_three)
+            test_filename = test_file_three.name
+        self.addCleanup(os.unlink, test_filename)
+        with self.assertRaises(ValueError):
+            CountryDataLoader(test_filename)
 if __name__ == "__main__":
     unittest.main()
