@@ -1,13 +1,16 @@
 import unittest
 import os
+import json
+import tempfile
+
 from country import Country
 from battle import Battle
 from game import Game
 from event_system import EventSystem
 from save_repository import SaveRepository
 from country_data_loader import CountryDataLoader
-import json
-import tempfile
+from ai_controller import AIController
+
 
 class CountryTests(unittest.TestCase):
     def test_discipline_conversion(self):
@@ -300,5 +303,62 @@ class GameFileTests(unittest.TestCase):
         self.addCleanup(os.unlink, test_filename)
         with self.assertRaises(ValueError):
             CountryDataLoader(test_filename)
+class AIControllerTests(unittest.TestCase):
+    def setUp(self):
+        self.ai_controller = AIController()
+        self.ai_country = Country(
+            "AI Country",
+            4.0,
+            "105%",
+            20000,
+            {"mil": 4, "dip": 3, "admin": 3},
+            300,
+            5,
+            charge_upfront=False,
+        )
+        self.weak_target = Country(
+            "Weak Target",
+            2.5,
+            "95%",
+            8000,
+            {"mil": 3, "dip": 3, "admin": 3},
+            100,
+            2,
+            charge_upfront=False,
+        )
+        self.strong_target = Country(
+            "Strong Target",
+            5.0,
+            "110%",
+            30000,
+            {"mil": 5, "dip": 3, "admin": 3},
+            700,
+            15,
+            charge_upfront=False,
+        )
+        self.possible_targets = [self.strong_target, self.weak_target]
+
+    def test_recruits_when_army_is_small_and_country_is_wealthy(self):
+        self.ai_country.troops = 8000
+        self.ai_country.ducats = 600
+        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        self.assertEqual(returned_data.action, "recruit")
+        self.assertEqual(returned_data.recruit_stacks, 1)
+        self.assertIsNone(returned_data.target)
+    def test_attacks_when_much_stronger_than_target(self):
+        self.ai_country.troops = 40000
+        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        self.assertEqual(returned_data.action, "attack")
+        self.assertIs(returned_data.target, self.weak_target)
+    def test_waits_when_no_other_action_is_suitable(self):
+        self.ai_country.troops = 10000
+        self.ai_country.ducats = 300
+        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        self.assertEqual(returned_data.action, "wait")
+    def test_waits_when_no_targets_exist(self):
+        returned_data = self.ai_controller.choose_action(self.ai_country, [])
+        self.assertEqual(returned_data.action, "wait")
+        self.assertIsNone(returned_data.target)
+        self.assertEqual(returned_data.recruit_stacks, 0)
 if __name__ == "__main__":
     unittest.main()

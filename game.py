@@ -1,4 +1,7 @@
 from event_system import EventSystem
+from country import Country
+from ai_controller import AIDecision
+from battle import Battle
 
 class Game:
     def __init__(self):
@@ -24,3 +27,14 @@ class Game:
         for country in countries:
             country.process_monthly_economy(self.monthly_advisor_expenses, self.picked_country_name)
         self.months_passed += 1
+    def execute_ai_decision(
+        self,
+        ai_country: Country,
+        decision: AIDecision,
+    ) -> None:
+        if decision.action == "recruit":
+            ai_country.recruit_troops(decision.recruit_stacks)
+
+        elif decision.action == "attack" and decision.target is not None:
+            battle = Battle(ai_country, decision.target)
+            battle.resolve_battle()

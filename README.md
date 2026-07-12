@@ -10,7 +10,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 
 - Tkinter GUI
 - Start menu with New Game and Load Game
-- Country selection
+- Data-driven country selection that creates one button per loaded country
 - Advisor selection with monthly advisor costs
 - Monthly economy simulation
 - Army maintenance
@@ -32,6 +32,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Mypy static type checking across the active Python modules
 - Dynamic country reports that support any number of loaded countries
 - Data-driven country setup so new countries can be added by editing configuration data
+- Rule-based AI decision prototype for recruit, attack, and wait actions
 
 ## Engineering Highlights
 
@@ -44,6 +45,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Backend/game logic is tested separately from the Tkinter GUI
 - Country-data tests use isolated temporary JSON files instead of modifying the real configuration
 - Loader tests cover valid data, missing required fields, and mismatched country/map entries
+- AI decisions use a typed dataclass so actions can carry targets and recruitment amounts
+- AI behavior tests cover recruitment, target selection, waiting, and empty target lists
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -65,6 +68,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `country_data_loader.py` - loads and validates country/map setup data from JSON
 - `countries.json` - data-driven country stats and map region configuration
 - `battle.py` - battle resolution logic
+- `ai_controller.py` - AI decision data and rule-based action selection
 - `map_ui.py` - clickable Tkinter canvas map and battle result popup
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system

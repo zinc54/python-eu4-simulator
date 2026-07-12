@@ -103,6 +103,12 @@ class GameGUI:
         button.pack()
         return button
 
+    def create_country_selection_handler(self, country_name: str) -> Callable[[], None]:
+        def handle_country_selection() -> None:
+            self.select_country(country_name)
+
+        return handle_country_selection
+
     def show_only_frame(self, frame_to_show: tk.Frame) -> None:
         for frame in self.frames:
             frame.pack_forget()
@@ -140,16 +146,12 @@ class GameGUI:
         self.show_start_screen()
 
     def build_country_screen(self):
-        self.ottomans_button = self.create_button(
-            self.country_selection_frame,
-            "Ottomans",
-            lambda: self.select_country("Ottomans")
-        )
-        self.france_button = self.create_button(
-            self.country_selection_frame,
-            "France",
-            lambda: self.select_country("France")
-        )
+        for country in self.countries:
+            self.create_button(
+                self.country_selection_frame,
+                country.name,
+                self.create_country_selection_handler(country.name),
+            )
         self.country_confirmation_label = tk.Label(self.country_selection_frame, text="")
 
 
