@@ -1,5 +1,6 @@
 from country import Country
 from dataclasses import dataclass
+from game_event import GameEvent
 
 
 @dataclass
@@ -14,12 +15,19 @@ class AIController:
         self,
         ai_country: Country,
         possible_targets: list[Country],
-    ) -> AIDecision:
+        months_passed: int = 0,
+    ) -> tuple[AIDecision, list[GameEvent]]:
+        self.event_log: list[GameEvent] = []
         if (
             ai_country.income > 10 or ai_country.ducats > 500
         ) and ai_country.troops < 10000:
-            return AIDecision(action="recruit", recruit_stacks=1)
+            recruited_stacks = 3
+            recruit_event = GameEvent(months_passed, ai_country.name, f"Month {months_passed}: {ai_country.name} has recruited {recruited_stacks} stacks of troops!", "recruitment")
+            self.event_log.append(recruit_event)
+            return AIDecision(action="recruit", recruit_stacks=recruited_stacks), self.event_log
         for country in possible_targets:
             if ai_country.troops > country.troops * 1.5:
-                return AIDecision(action="attack", target=country)
-        return AIDecision(action="wait")
+                battle_event = GameEvent(months_passed, ai_country.name, f"Month {months_passed}: {ai_country.name} has attacked {country.name}!", "battle")
+                self.event_log.append(battle_event)
+                return AIDecision(action="attack", target=country), self.event_log
+        return AIDecision(action="wait"), self.event_log

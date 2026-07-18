@@ -68,7 +68,11 @@ class CountryTests(unittest.TestCase):
         ducats_before = country.ducats
         advisor_costs = 3
         # -3 ducats every month for advisors and -2 every month for soldiers
-        country.process_monthly_economy(advisor_costs, country.name)
+        country.process_monthly_economy(
+            advisor_costs,
+            country.name,
+            0,
+        )
         self.assertEqual(ducats_before - country.ducats, 5)
     def test_loan_processing(self):
         country = Country(
@@ -82,7 +86,14 @@ class CountryTests(unittest.TestCase):
         )
         interest_before = country.monthly_interest_payments
         advisor_costs = 80
-        country.process_monthly_economy(advisor_costs, country.name)
+        event_log = country.process_monthly_economy(
+            advisor_costs,
+            country.name,
+            0,
+        )
+        self.assertEqual(event_log[0].category, "loan")
+        self.assertEqual(event_log[0].actor_name, country.name)
+        self.assertEqual(event_log[0].month, 0)
         self.assertEqual(country.loans, 2)
         self.assertEqual(country.monthly_interest_payments - interest_before, 0.5)
         self.assertEqual(country.ducats, 73)
@@ -341,22 +352,28 @@ class AIControllerTests(unittest.TestCase):
     def test_recruits_when_army_is_small_and_country_is_wealthy(self):
         self.ai_country.troops = 8000
         self.ai_country.ducats = 600
-        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        returned_data, event_log = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
         self.assertEqual(returned_data.action, "recruit")
-        self.assertEqual(returned_data.recruit_stacks, 1)
+        self.assertEqual(returned_data.recruit_stacks, 3)
         self.assertIsNone(returned_data.target)
+        self.assertEqual(event_log[0].category, "recruitment")
+        self.assertEqual(event_log[0].actor_name, self.ai_country.name)
     def test_attacks_when_much_stronger_than_target(self):
         self.ai_country.troops = 40000
-        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        returned_data, event_log = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
         self.assertEqual(returned_data.action, "attack")
+        self.assertEqual(event_log[0].category, "battle")
+        self.assertEqual(event_log[0].actor_name, self.ai_country.name)
         self.assertIs(returned_data.target, self.weak_target)
     def test_waits_when_no_other_action_is_suitable(self):
         self.ai_country.troops = 10000
         self.ai_country.ducats = 300
-        returned_data = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        returned_data, event_log = self.ai_controller.choose_action(self.ai_country, self.possible_targets)
+        self.assertEqual(event_log, [])
         self.assertEqual(returned_data.action, "wait")
     def test_waits_when_no_targets_exist(self):
-        returned_data = self.ai_controller.choose_action(self.ai_country, [])
+        returned_data, event_log = self.ai_controller.choose_action(self.ai_country, [])
+        self.assertEqual(event_log, [])
         self.assertEqual(returned_data.action, "wait")
         self.assertIsNone(returned_data.target)
         self.assertEqual(returned_data.recruit_stacks, 0)

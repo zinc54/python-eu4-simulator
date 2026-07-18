@@ -2,12 +2,14 @@ from event_system import EventSystem
 from country import Country
 from ai_controller import AIController, AIDecision
 from battle import Battle
+from game_event import GameEvent
 
 
 class Game:
     def __init__(self):
         self.months_passed = 0
         self.ai_controller = AIController()
+        self.event_log: list[GameEvent] = []
         self.event_sys = EventSystem()
         self.running = True
         self.monthly_advisor_expenses = 0
@@ -29,7 +31,7 @@ class Game:
                 for possible_target in countries
                 if possible_target is not country
             ]
-            decision = self.ai_controller.choose_action(country, possible_targets)
+            decision, event_log = self.ai_controller.choose_action(country, possible_targets, self.months_passed)
             self.execute_ai_decision(country, decision)
 
     def get_month_action(self):
@@ -42,9 +44,10 @@ class Game:
 
     def advance_month(self, countries):
         for country in countries:
-            country.process_monthly_economy(
+            self.event_log = country.process_monthly_economy(
                 self.monthly_advisor_expenses,
                 self.picked_country_name,
+                self.months_passed,
             )
         self.run_ai_turns(countries)
         self.months_passed += 1

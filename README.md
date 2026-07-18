@@ -33,6 +33,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Dynamic country reports that support any number of loaded countries
 - Data-driven country setup so new countries can be added by editing configuration data
 - Rule-based AI decision prototype for recruit, attack, and wait actions
+- Structured backend world-event prototype for loans, AI recruitment, and AI attacks
 
 ## Engineering Highlights
 
@@ -47,6 +48,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Loader tests cover valid data, missing required fields, and mismatched country/map entries
 - AI decisions use a typed dataclass so actions can carry targets and recruitment amounts
 - AI behavior tests cover recruitment, target selection, waiting, and empty target lists
+- World events use a typed `GameEvent` dataclass instead of unstructured GUI-only messages
+- Economy and AI tests verify generated event categories and acting countries
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -69,6 +72,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `countries.json` - data-driven country stats and map region configuration
 - `battle.py` - battle resolution logic
 - `ai_controller.py` - AI decision data and rule-based action selection
+- `game_event.py` - structured records for world activity such as loans, recruitment, and attacks
 - `map_ui.py` - clickable Tkinter canvas map and battle result popup
 - `event_system.py` - random events and their effects
 - `save_repository.py` - SQLite save/load/delete system
@@ -140,6 +144,9 @@ The current main version is the GUI + SQLite version.
 
 Future cleanup goals:
 
+- Accumulate every country's economy and AI events in the persistent game-level event log
+- Add a scrollable GUI world-events screen
+- Save and load world-event history through SQLite
 - Add stronger save-name validation
 - Continue expanding data-driven country/map configuration
 - Continue separating GUI code from backend game logic
@@ -171,6 +178,7 @@ This project helped me learn:
 - Static analysis and linting with Ruff
 - Static type checking with mypy
 - Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`
+- Returning and testing lists of structured event objects across backend systems
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes
 - Separating user interface code from backend logic

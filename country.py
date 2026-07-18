@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from typing import cast
+from game_event import GameEvent
+
+
 @dataclass
 class Country:
     name: str
@@ -43,14 +46,31 @@ class Country:
         discipline = cast(float, self.discipline)
         damage = self.troops * discipline  * morale_percentage * tech_damage_buff
         return damage
-
-    def process_monthly_economy(self, advisor_costs, picked_country_name):
+    def add_loan(self, loan_size: int, interest: float, months_passed: int) -> None:
+        self.ducats += loan_size
+        loan_event = GameEvent(
+            month=months_passed,
+            actor_name=self.name,
+            message=f"{self.name} took a {loan_size}-ducat loan at {interest * 100}% annual interest.",
+            category="loan",
+        )
+        self.event_log.append(loan_event)
+        self.monthly_interest_payments += (loan_size * interest) / 12
+    def process_monthly_economy(
+        self,
+        advisor_costs,
+        picked_country_name,
+        months_passed: int,
+    ) -> list[GameEvent]:
+        self.event_log: list[GameEvent] = []
+        self.months_passed = months_passed
         self.advisor_costs = advisor_costs
         if self.name == picked_country_name:
             self.ducats -= advisor_costs
         self.ducats -= self.monthly_expenses
         self.ducats += self.income
         self.ducats -= self.monthly_interest_payments
+        interest = 0.04
         while self.ducats < 0:
             print("You need to take a loan! Having more than 10 loans will bankrupt you and end the game!")
             self.loans += 1
@@ -58,21 +78,14 @@ class Country:
                 print("Game over! You are bankrupt!")
                 raise SystemExit
             if self.troops >= 40000:
-                self.ducats += 200
-                print(f"You have taken a 200 ducat loan at 4 percent interest. Current amount of loans: {self.loans}")
-                self.monthly_interest_payments += (200 * 0.04) / 12
+                self.add_loan(200, interest, months_passed)
             elif self.troops >= 30000:
-                self.ducats += 150
-                print(f"You have taken a 150 ducat loan at 4 percent interest. Current amount of loans: {self.loans}")
-                self.monthly_interest_payments += (150 * 0.04) / 12
+                self.add_loan(150, interest, months_passed)
             elif self.troops >= 20000:
-                self.ducats += 100
-                print(f"You have taken a 100 ducat loan at 4 percent interest. Current amount of loans: {self.loans}")
-                self.monthly_interest_payments += (100 * 0.04) / 12
+                self.add_loan(100, interest, months_passed)
             else:
-                self.ducats += 75
-                print(f"You have taken a 75 ducat loan at 4 percent interest. Current amount of loans: {self.loans}")
-                self.monthly_interest_payments += (75 * 0.04) / 12
+                self.add_loan(75, interest, months_passed)
+        return self.event_log
     def recruit_troops(self, requested_stacks):
         try:
             requested_stacks = int(requested_stacks)
