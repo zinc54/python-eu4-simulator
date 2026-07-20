@@ -17,11 +17,10 @@ class AIController:
         possible_targets: list[Country],
         months_passed: int = 0,
     ) -> tuple[AIDecision, list[GameEvent]]:
+        recruited_stacks = 3
+        recruitment_cost = ai_country.calculate_recruitment_cost(recruited_stacks)
         self.event_log: list[GameEvent] = []
-        if (
-            ai_country.income > 10 or ai_country.ducats > 500
-        ) and ai_country.troops < 10000:
-            recruited_stacks = 3
+        if (ai_country.income > 10 or ai_country.ducats > 500) and (ai_country.ducats >= recruitment_cost) and (ai_country.troops < 10000):
             recruit_event = GameEvent(months_passed, ai_country.name, f"Month {months_passed}: {ai_country.name} has recruited {recruited_stacks} stacks of troops!", "recruitment")
             self.event_log.append(recruit_event)
             return AIDecision(action="recruit", recruit_stacks=recruited_stacks), self.event_log

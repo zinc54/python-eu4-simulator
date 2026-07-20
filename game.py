@@ -32,6 +32,7 @@ class Game:
                 if possible_target is not country
             ]
             decision, event_log = self.ai_controller.choose_action(country, possible_targets, self.months_passed)
+            self.event_log.extend(event_log)
             self.execute_ai_decision(country, decision)
 
     def get_month_action(self):
@@ -44,11 +45,12 @@ class Game:
 
     def advance_month(self, countries):
         for country in countries:
-            self.event_log = country.process_monthly_economy(
+            country_events = country.process_monthly_economy(
                 self.monthly_advisor_expenses,
                 self.picked_country_name,
                 self.months_passed,
             )
+            self.event_log.extend(country_events)
         self.run_ai_turns(countries)
         self.months_passed += 1
 

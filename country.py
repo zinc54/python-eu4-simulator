@@ -86,17 +86,19 @@ class Country:
             else:
                 self.add_loan(75, interest, months_passed)
         return self.event_log
+    def calculate_recruitment_cost(self, requested_stacks: int) -> int:
+        return requested_stacks * 10
     def recruit_troops(self, requested_stacks):
         try:
             requested_stacks = int(requested_stacks)
+            recruit_upfront_cost = self.calculate_recruitment_cost(requested_stacks)
         except ValueError:
             return "invalid_input"
-        if requested_stacks * 10 > self.ducats:
+        if recruit_upfront_cost > self.ducats:
             return "too_expensive"
         elif requested_stacks <= 0:
             return "invalid_amount"
         else:
-            recruit_upfront_cost = requested_stacks * 10
             recruit_monthly_cost = requested_stacks * 0.2
             self.ducats -= recruit_upfront_cost
             self.monthly_expenses += recruit_monthly_cost
