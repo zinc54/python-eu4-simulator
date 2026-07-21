@@ -10,7 +10,7 @@ from event_system import EventSystem
 from save_repository import SaveRepository
 from country_data_loader import CountryDataLoader
 from ai_controller import AIController
-
+from game_event import GameEvent
 
 class CountryTests(unittest.TestCase):
     def test_discipline_conversion(self):
@@ -93,7 +93,7 @@ class CountryTests(unittest.TestCase):
         )
         self.assertEqual(event_log[0].category, "loan")
         self.assertEqual(event_log[0].actor_name, country.name)
-        self.assertEqual(event_log[0].month, 0)
+        self.assertEqual(event_log[0].month, 1)
         self.assertEqual(country.loans, 2)
         self.assertEqual(country.monthly_interest_payments - interest_before, 0.5)
         self.assertEqual(country.ducats, 73)
@@ -377,5 +377,52 @@ class AIControllerTests(unittest.TestCase):
         self.assertEqual(returned_data.action, "wait")
         self.assertIsNone(returned_data.target)
         self.assertEqual(returned_data.recruit_stacks, 0)
+class EventLogTests(unittest.TestCase):
+    def setUp(self):
+        self.event_log_test_game = Game()
+        self.ai_controller = AIController()
+        self.mid_country = Country(
+            "Mid Country",
+            4.0,
+            "105%",
+            20000,
+            {"mil": 4, "dip": 3, "admin": 3},
+            300,
+            5,
+            charge_upfront=False,
+        )
+        self.weak_target = Country(
+            "Weak Target",
+            2.5,
+            "95%",
+            8000,
+            {"mil": 3, "dip": 3, "admin": 3},
+            100,
+            2,
+            charge_upfront=False,
+        )
+        self.strong_target = Country(
+            "Strong Target",
+            5.0,
+            "110%",
+            30000,
+            {"mil": 5, "dip": 3, "admin": 3},
+            700,
+            15,
+            charge_upfront=False,
+        )
+        self.countries = [self.mid_country, self.weak_target, self.strong_target]
+    def test_game_event_collection(self):
+        self.event_log_test_game.advance_month(self.countries)
+        old_event_log_length = len(self.event_log_test_game.event_log)
+        self.assertGreater(old_event_log_length, 0)
+        self.assertTrue(
+            all(isinstance(event, GameEvent) for event in self.event_log_test_game.event_log)
+        )
+        self.assertTrue(
+            all(event.month == 1 for event in self.event_log_test_game.event_log)
+        )
+        self.event_log_test_game.advance_month(self.countries)
+        self.assertGreater(len(self.event_log_test_game.event_log), old_event_log_length)
 if __name__ == "__main__":
     unittest.main()

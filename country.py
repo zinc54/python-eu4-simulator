@@ -49,7 +49,7 @@ class Country:
     def add_loan(self, loan_size: int, interest: float, months_passed: int) -> None:
         self.ducats += loan_size
         loan_event = GameEvent(
-            month=months_passed,
+            month=months_passed+1,
             actor_name=self.name,
             message=f"{self.name} took a {loan_size}-ducat loan at {interest * 100}% annual interest.",
             category="loan",

@@ -9,6 +9,7 @@ from gui_helpers.advisor_ui import AdvisorUI
 from country import Country
 from collections.abc import Callable
 from map_ui import MapUI
+from game_event import GameEvent
 
 class GameGUI:
     def __init__(self, game, countries, map_data):
@@ -287,3 +288,5 @@ class GameGUI:
         )
         self.chosen_country_label.pack()
         self.build_country_reports()
+    def get_event_log(self) -> list[GameEvent]:
+        return self.game.event_log
