@@ -65,3 +65,21 @@ class Game:
         elif decision.action == "attack" and decision.target is not None:
             battle = Battle(ai_country, decision.target)
             battle.resolve_battle()
+
+    def recruit_troops(
+        self,
+        country: Country,
+        requested_stacks: str,
+    ) -> str:
+        result = country.recruit_troops(requested_stacks)
+
+        if result == "success":
+            recruitment_event = GameEvent(
+                month=self.months_passed,
+                actor_name=country.name,
+                message=f"{country.name} has recruited {requested_stacks} stacks of troops.",
+                category="recruitment",
+            )
+            self.event_log.append(recruitment_event)
+
+        return result

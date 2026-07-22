@@ -10,7 +10,7 @@ from country import Country
 from collections.abc import Callable
 from map_ui import MapUI
 from game_event import GameEvent
-
+from gui_helpers.world_events_ui import WorldEventsUI
 class GameGUI:
     def __init__(self, game, countries, map_data):
         self.save_rep = SaveRepository()
@@ -24,6 +24,7 @@ class GameGUI:
         self.first_time_game_frame_shown = True
         self.can_pause = False
         self.create_frames()
+        self.world_events_ui = WorldEventsUI(self.window, self.get_event_log)
         self.map_ui = MapUI(
             self.map_frame,
             self.game,
@@ -47,6 +48,7 @@ class GameGUI:
             self.show_only_frame,
             self.show_game_frame,
             self.get_player_country,
+            self.recruit_player_troops,
             self.refresh_display,
             self.create_button,
             self.set_can_pause
@@ -178,6 +180,7 @@ class GameGUI:
             "Open Map",
             self.show_map_screen
         )
+        self.create_button(self.game_frame, "📜", self.world_events_ui.toggle)
     def show_map_screen(self):
         self.map_ui.refresh_map_display()
         self.show_only_frame(self.map_frame)
@@ -235,6 +238,7 @@ class GameGUI:
     # ---------- Month Flow ----------
     def next_month(self) -> None:
         self.game.advance_month(self.countries)
+        self.world_events_ui.refresh_events()
         self.refresh_display()
         month_status = self.game.get_month_action()
         if month_status == "event":
@@ -290,3 +294,11 @@ class GameGUI:
         self.build_country_reports()
     def get_event_log(self) -> list[GameEvent]:
         return self.game.event_log
+    def recruit_player_troops(
+        self,
+        country: Country,
+        requested_stacks: str,
+    ) -> str:
+        result = self.game.recruit_troops(country, requested_stacks)
+        self.world_events_ui.refresh_events()
+        return result

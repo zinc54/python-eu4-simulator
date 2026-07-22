@@ -33,7 +33,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Dynamic country reports that support any number of loaded countries
 - Data-driven country setup so new countries can be added by editing configuration data
 - Rule-based AI decision prototype for recruit, attack, and wait actions
-- Structured backend world-event prototype for loans, AI recruitment, and AI attacks
+- Scrollable in-game world-events panel with live event history
+- Structured world events for player recruitment, loans, AI recruitment, and AI attacks
 
 ## Engineering Highlights
 
@@ -49,6 +50,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - AI decisions use a typed dataclass so actions can carry targets and recruitment amounts
 - AI behavior tests cover recruitment, target selection, waiting, and empty target lists
 - World events use a typed `GameEvent` dataclass instead of unstructured GUI-only messages
+- The world-events panel reads the current game log through a callback, so it keeps using the active game after a save is loaded
 - Economy and AI tests verify generated event categories and acting countries
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
@@ -129,6 +131,8 @@ The database stores:
 - monthly advisor expenses
 - country stats for each saved country
 
+World-event history is currently displayed during the active game session, but is not yet saved to SQLite. Loading a save starts with an empty world-event history.
+
 The GUI can:
 
 - create named save slots
@@ -144,8 +148,6 @@ The current main version is the GUI + SQLite version.
 
 Future cleanup goals:
 
-- Accumulate every country's economy and AI events in the persistent game-level event log
-- Add a scrollable GUI world-events screen
 - Save and load world-event history through SQLite
 - Add stronger save-name validation
 - Continue expanding data-driven country/map configuration
@@ -179,6 +181,7 @@ This project helped me learn:
 - Static type checking with mypy
 - Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`
 - Returning and testing lists of structured event objects across backend systems
+- Building a scrollable Tkinter text panel and toggling it with callbacks
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes
 - Separating user interface code from backend logic

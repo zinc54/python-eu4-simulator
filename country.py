@@ -56,6 +56,7 @@ class Country:
         )
         self.event_log.append(loan_event)
         self.monthly_interest_payments += (loan_size * interest) / 12
+
     def process_monthly_economy(
         self,
         advisor_costs,
@@ -88,7 +89,10 @@ class Country:
         return self.event_log
     def calculate_recruitment_cost(self, requested_stacks: int) -> int:
         return requested_stacks * 10
-    def recruit_troops(self, requested_stacks):
+    def recruit_troops(
+        self,
+        requested_stacks,
+    ) -> str:
         try:
             requested_stacks = int(requested_stacks)
             recruit_upfront_cost = self.calculate_recruitment_cost(requested_stacks)

@@ -6,6 +6,7 @@ class RecruitmentUI:
             show_only_frame,
             show_game_frame,
             get_player_country,
+            recruit_player_troops,
             refresh_display,
             create_button,
             set_can_pause,
@@ -14,6 +15,7 @@ class RecruitmentUI:
         self.show_only_frame = show_only_frame
         self.show_game_frame = show_game_frame
         self.get_player_country = get_player_country
+        self.recruit_player_troops = recruit_player_troops
         self.refresh_display = refresh_display
         self.create_button = create_button
         self.set_can_pause = set_can_pause
@@ -65,7 +67,7 @@ class RecruitmentUI:
     def apply_recruitment(self):
         country = self.get_player_country()
         requested_stacks = self.recruitment_entry.get()
-        result = country.recruit_troops(requested_stacks)
+        result = self.recruit_player_troops(country, requested_stacks)
         if result == "invalid_input":
             self.incorrect_input_warning_recruitment.pack()
             self.too_expensive_recruitment.pack_forget()
