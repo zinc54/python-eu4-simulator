@@ -1,6 +1,7 @@
 import sqlite3
 from game import Game
 from country import Country
+from game_event import GameEvent
 class SaveRepository:
     def __init__(self, database_name="eu4_saves.db"):
         self.connection = sqlite3.connect(database_name)
@@ -35,9 +36,24 @@ class SaveRepository:
                 FOREIGN KEY (save_id) REFERENCES saves(id)
             )
         """)
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS game_events (
+                id INTEGER PRIMARY KEY,
+                save_id INTEGER,
+                month INTEGER,
+                actor_name TEXT,
+                message TEXT,
+                category TEXT,
+                FOREIGN KEY (save_id) REFERENCES saves(id)
+            )
+        """)
     def close(self):
         self.connection.close()
     def delete_save(self, save_id):
+        self.cursor.execute(
+            "DELETE FROM game_events WHERE save_id = ?",
+            (save_id,)
+        )
         self.cursor.execute(
             "DELETE FROM countries WHERE save_id = ?",
             (save_id,)
@@ -58,7 +74,7 @@ class SaveRepository:
         else:
             return True
     def save_game(self, save_name, game, countries):
-
+        event_log = game.event_log
         final_save_name = save_name
         number = 2
         while self.save_name_exists(final_save_name):
@@ -91,6 +107,20 @@ class SaveRepository:
                     country.income,
                     country.monthly_interest_payments,
                     country.loans,
+                )
+            )
+        for event in event_log:
+            self.cursor.execute(
+                """
+                INSERT INTO game_events (save_id, month, actor_name, message, category)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    self.save_id,
+                    event.month,
+                    event.actor_name,
+                    event.message,
+                    event.category,
                 )
             )
         self.connection.commit()
@@ -131,6 +161,25 @@ class SaveRepository:
             countryObject.loans = loans
             countryObject.monthly_interest_payments = monthly_interest_payments
             loaded_countries.append(countryObject)
+        self.cursor.execute(
+            """
+            SELECT month, actor_name, message, category
+            FROM game_events
+            WHERE save_id = ?
+            ORDER BY id
+            """,
+            (save_id,)
+        )
+        loaded_game_events = []
+        game_event_rows = self.cursor.fetchall()
+
+        for event in game_event_rows:
+            month, actor_name, message, category = event
+            game_event_object = GameEvent(month, actor_name, message, category)
+            loaded_game_events.append(game_event_object)
+
+        self.loaded_game.event_log = loaded_game_events
+
         return loaded_countries, self.loaded_game
     def list_saves(self):
         self.cursor.execute(

@@ -35,6 +35,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Rule-based AI decision prototype for recruit, attack, and wait actions
 - Scrollable in-game world-events panel with live event history
 - Structured world events for player recruitment, loans, AI recruitment, and AI attacks
+- SQLite persistence for world-event history across save/load sessions
 
 ## Engineering Highlights
 
@@ -51,6 +52,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - AI behavior tests cover recruitment, target selection, waiting, and empty target lists
 - World events use a typed `GameEvent` dataclass instead of unstructured GUI-only messages
 - The world-events panel reads the current game log through a callback, so it keeps using the active game after a save is loaded
+- Save/load tests verify that structured world events survive a SQLite round trip and are deleted with their save slot
 - Economy and AI tests verify generated event categories and acting countries
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
@@ -130,8 +132,7 @@ The database stores:
 - selected player country
 - monthly advisor expenses
 - country stats for each saved country
-
-World-event history is currently displayed during the active game session, but is not yet saved to SQLite. Loading a save starts with an empty world-event history.
+- structured world-event history
 
 The GUI can:
 
@@ -147,8 +148,6 @@ The GUI can:
 The current main version is the GUI + SQLite version.
 
 Future cleanup goals:
-
-- Save and load world-event history through SQLite
 - Add stronger save-name validation
 - Continue expanding data-driven country/map configuration
 - Continue separating GUI code from backend game logic

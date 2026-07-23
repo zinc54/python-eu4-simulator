@@ -184,12 +184,19 @@ class GameFileTests(unittest.TestCase):
         test_save_sql = Game()
         test_sql_system = SaveRepository(":memory:")
         test_save_sql.picked_country_name = "Ottomans"
+
+        test_save_sql.recruit_troops(self.stronger_country, "2")
+        test_save_sql.recruit_troops(self.weaker_country, "3")
+
         testing_save_id = test_sql_system.save_game("Testing module Save", test_save_sql, self.original_countries)
         loaded_countries, loaded_game_sql = test_sql_system.load_game(testing_save_id)
+
+        self.assertEqual(loaded_game_sql.picked_country_name, test_save_sql.picked_country_name)
+        self.assertEqual(loaded_game_sql.monthly_advisor_expenses, test_save_sql.monthly_advisor_expenses)
+        self.assertEqual(loaded_game_sql.months_passed,  test_save_sql.months_passed)
+
+        # Country Checks
         for i in range(0, 2):
-            self.assertEqual(loaded_game_sql.picked_country_name, test_save_sql.picked_country_name)
-            self.assertEqual(loaded_game_sql.monthly_advisor_expenses, test_save_sql.monthly_advisor_expenses)
-            self.assertEqual(loaded_game_sql.months_passed,  test_save_sql.months_passed)
             self.assertEqual(loaded_countries[i].name, self.original_countries[i].name)
             self.assertEqual(loaded_countries[i].morale, self.original_countries[i].morale)
             self.assertEqual(loaded_countries[i].discipline, self.original_countries[i].discipline)
@@ -198,8 +205,12 @@ class GameFileTests(unittest.TestCase):
             self.assertEqual(loaded_countries[i].ducats, self.original_countries[i].ducats)
             self.assertEqual(loaded_countries[i].income, self.original_countries[i].income)
             self.assertEqual(loaded_countries[i].monthly_interest_payments, self.original_countries[i].monthly_interest_payments)
-            self.assertEqual(loaded_countries[i].loans, self.original_countries[i].loans)            
+            self.assertEqual(loaded_countries[i].loans, self.original_countries[i].loans)
 
+        self.assertEqual(
+            test_save_sql.event_log,
+            loaded_game_sql.event_log,
+        )
     def test_sql_delete_save(self):
         test_save_sql = Game()
         test_sql_system = SaveRepository(":memory:")
@@ -212,6 +223,28 @@ class GameFileTests(unittest.TestCase):
 
         self.assertEqual(len(remaining_saves), 1)
         self.assertEqual(remaining_saves[0][0], second_save_id)
+    def test_sql_delete_events(self):
+        test_sql_system = SaveRepository(":memory:")
+        first_game = Game()
+        second_game = Game()
+        first_game.recruit_troops(self.weaker_country, "2")
+        second_game.recruit_troops(self.stronger_country, "5")
+
+        first_save_id = test_sql_system.save_game("First Save", first_game, self.original_countries)
+        second_save_id = test_sql_system.save_game("Second Save", second_game, self.original_countries)
+        test_sql_system.delete_save(first_save_id)
+
+        existing_event_rows = test_sql_system.cursor.execute(
+            "SELECT * FROM game_events WHERE save_id = ?",
+            (second_save_id,),
+        ).fetchall()
+        deleted_event_rows = test_sql_system.cursor.execute(
+            "SELECT * FROM game_events WHERE save_id = ?",
+            (first_save_id,),
+        ).fetchall()
+
+        self.assertEqual(len(deleted_event_rows), 0)
+        self.assertEqual(len(existing_event_rows), 1)
     def test_month_action_events(self):
         game = Game()
 
