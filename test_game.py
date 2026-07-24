@@ -457,5 +457,6 @@ class EventLogTests(unittest.TestCase):
         )
         self.event_log_test_game.advance_month(self.countries)
         self.assertGreater(len(self.event_log_test_game.event_log), old_event_log_length)
+
 if __name__ == "__main__":
     unittest.main()

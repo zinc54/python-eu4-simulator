@@ -1,7 +1,7 @@
 import tkinter as tk
 from collections.abc import Callable
 from typing import TypedDict
-
+from game_event import GameEvent
 from battle import Battle
 
 
@@ -151,6 +151,8 @@ class MapUI:
             return
         started_battle = Battle(attacker, defender)
         battle_result_info = started_battle.resolve_battle()
+        battle_event = GameEvent(self.game.months_passed, battle_result_info["attacker"]["name"], f"{battle_result_info['attacker']['name']} has attacked {battle_result_info['defender']['name']}!", "battle")
+        self.game.event_log.append(battle_event)
         self.show_battle_result(battle_result_info)
     def refresh_map_display(self):
         self.canvas.itemconfig(
