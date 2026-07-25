@@ -43,16 +43,6 @@ class GameGUI:
             self.get_game_state,
             self.create_button
         )
-        self.recruitment_ui = RecruitmentUI(
-            self.recruitment_frame,
-            self.show_only_frame,
-            self.show_game_frame,
-            self.get_player_country,
-            self.recruit_player_troops,
-            self.refresh_display,
-            self.create_button,
-            self.set_can_pause
-        )
         self.event_ui = EventUI(
             self.event_frame,
             self.event_sys,
@@ -61,6 +51,17 @@ class GameGUI:
             self.get_player_country,
             self.refresh_display,
             self.set_can_pause
+        )
+        self.recruitment_ui = RecruitmentUI(
+            self.recruitment_frame,
+            self.show_only_frame,
+            self.show_game_frame,
+            self.get_player_country,
+            self.recruit_player_troops,
+            self.refresh_display,
+            self.create_button,
+            self.set_can_pause,
+            self.event_ui,
         )
         self.advisor_ui = AdvisorUI(
             self.advisor_selection_frame,
@@ -241,10 +242,13 @@ class GameGUI:
         self.world_events_ui.refresh_events()
         self.refresh_display()
         month_status = self.game.get_month_action()
-        if month_status == "event":
+        if month_status == "recruit and event":
+
+            self.recruitment_ui.show_recruitment_screen(True)
+        elif month_status == "event":
             self.event_ui.show_event_screen()
         elif month_status == "recruitment":
-            self.recruitment_ui.show_recruitment_screen()
+            self.recruitment_ui.show_recruitment_screen(False)
     # ---------- Country / Advisors ----------
     def select_country(self, country_name: str) -> None:
         self.game.picked_country_name = country_name

@@ -249,8 +249,11 @@ class GameFileTests(unittest.TestCase):
         game = Game()
 
         game.months_passed = 12
-        self.assertEqual(game.get_month_action(), "event")
-
+        self.assertEqual(game.get_month_action(), "recruit and event")
+        game.months_passed = 24
+        self.assertEqual(game.get_month_action(), "recruit and event")
+        game.months_passed = 60
+        self.assertEqual(game.get_month_action(), "recruit and event")
         game.months_passed = 6
         self.assertEqual(game.get_month_action(), "recruitment")
 
@@ -445,6 +448,20 @@ class EventLogTests(unittest.TestCase):
             charge_upfront=False,
         )
         self.countries = [self.mid_country, self.weak_target, self.strong_target]
+    def test_player_attacking_battles(self):
+        self.event_log_test_game.player_attacks_ai(
+            self.strong_target,
+            self.weak_target,
+        )
+        player_battle_game_event = GameEvent(
+            month=0,
+            actor_name="Strong Target",
+            message="Strong Target has attacked Weak Target!",
+            category="battle",
+        )
+
+        self.assertEqual(len(self.event_log_test_game.event_log), 1)
+        self.assertEqual(self.event_log_test_game.event_log[0], player_battle_game_event)
     def test_game_event_collection(self):
         self.event_log_test_game.advance_month(self.countries)
         old_event_log_length = len(self.event_log_test_game.event_log)
@@ -457,6 +474,5 @@ class EventLogTests(unittest.TestCase):
         )
         self.event_log_test_game.advance_month(self.countries)
         self.assertGreater(len(self.event_log_test_game.event_log), old_event_log_length)
-
 if __name__ == "__main__":
     unittest.main()

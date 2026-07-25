@@ -1,9 +1,6 @@
 import tkinter as tk
 from collections.abc import Callable
 from typing import TypedDict
-from game_event import GameEvent
-from battle import Battle
-
 
 class CountryMapData(TypedDict):
     x1: int
@@ -149,10 +146,7 @@ class MapUI:
                 text="Pick an enemy country before starting a battle.",
             )
             return
-        started_battle = Battle(attacker, defender)
-        battle_result_info = started_battle.resolve_battle()
-        battle_event = GameEvent(self.game.months_passed, battle_result_info["attacker"]["name"], f"{battle_result_info['attacker']['name']} has attacked {battle_result_info['defender']['name']}!", "battle")
-        self.game.event_log.append(battle_event)
+        battle_result_info = self.game.player_attacks_ai(attacker, defender)
         self.show_battle_result(battle_result_info)
     def refresh_map_display(self):
         self.canvas.itemconfig(

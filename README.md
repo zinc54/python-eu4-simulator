@@ -34,8 +34,9 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Data-driven country setup so new countries can be added by editing configuration data
 - Rule-based AI decision prototype for recruit, attack, and wait actions
 - Scrollable in-game world-events panel with live event history
-- Structured world events for player recruitment, loans, AI recruitment, and AI attacks
+- Structured world events for player recruitment, player battles, loans, AI recruitment, and AI attacks
 - SQLite persistence for world-event history across save/load sessions
+- Combined month scheduling so recruitment and random events both run when their schedules overlap
 
 ## Engineering Highlights
 
@@ -54,6 +55,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - The world-events panel reads the current game log through a callback, so it keeps using the active game after a save is loaded
 - Save/load tests verify that structured world events survive a SQLite round trip and are deleted with their save slot
 - Economy and AI tests verify generated event categories and acting countries
+- Player battles are resolved and logged by the backend `Game` object instead of the map UI
+- Month-action tests cover overlapping recruitment and event schedules, including months 12, 24, and 60
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -180,6 +183,7 @@ This project helped me learn:
 - Static type checking with mypy
 - Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`
 - Returning and testing lists of structured event objects across backend systems
+- Coordinating multiple scheduled actions that occur during the same game month
 - Building a scrollable Tkinter text panel and toggling it with callbacks
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes

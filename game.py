@@ -36,9 +36,14 @@ class Game:
             self.execute_ai_decision(country, decision)
 
     def get_month_action(self):
-        if self.months_passed % 12 == 0:
+        event_time = self.months_passed % 12 == 0
+        recruitment_time = self.months_passed % 6 == 0
+
+        if event_time and recruitment_time:
+            return "recruit and event"
+        elif event_time:
             return "event"
-        elif self.months_passed % 6 == 0:
+        elif recruitment_time:
             return "recruitment"
         else:
             return "continue"
@@ -65,7 +70,14 @@ class Game:
         elif decision.action == "attack" and decision.target is not None:
             battle = Battle(ai_country, decision.target)
             battle.resolve_battle()
+    def player_attacks_ai(self, attacker, defender) -> dict:
+        started_battle = Battle(attacker, defender)
+        battle_result_info = started_battle.resolve_battle()
 
+        battle_event = GameEvent(self.months_passed, battle_result_info["attacker"]["name"], f"{battle_result_info['attacker']['name']} has attacked {battle_result_info['defender']['name']}!", "battle")
+        self.event_log.append(battle_event)
+
+        return battle_result_info
     def recruit_troops(
         self,
         country: Country,
