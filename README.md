@@ -36,7 +36,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Scrollable in-game world-events panel with live event history
 - Structured world events for player recruitment, player battles, loans, AI recruitment, and AI attacks
 - SQLite persistence for world-event history across save/load sessions
-- Combined month scheduling so recruitment and random events both run when their schedules overlap
+- Queued monthly action sequencing so recruitment and random events both finish before the next month when their schedules overlap
+- Army maintenance that automatically recalculates from current troop counts after recruitment, battles, and events
 
 ## Engineering Highlights
 
@@ -57,6 +58,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Economy and AI tests verify generated event categories and acting countries
 - Player battles are resolved and logged by the backend `Game` object instead of the map UI
 - Month-action tests cover overlapping recruitment and event schedules, including months 12, 24, and 60
+- `GameGUI` owns an ordered monthly action queue, while focused UI helpers report completion through callbacks
+- Army maintenance is a computed `Country` property, preventing stale costs when troop counts change
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -184,6 +187,8 @@ This project helped me learn:
 - Type hints including unions, callbacks, `TypedDict`, class-level annotations, and `cast`
 - Returning and testing lists of structured event objects across backend systems
 - Coordinating multiple scheduled actions that occur during the same game month
+- Using completion callbacks to sequence Tkinter screens without blocking the event loop
+- Using `@property` for values derived from other state instead of manually synchronizing duplicate state
 - Building a scrollable Tkinter text panel and toggling it with callbacks
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes

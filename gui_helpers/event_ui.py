@@ -7,18 +7,16 @@ class EventUI:
         event_frame,
         event_system,
         show_only_frame,
-        show_game_frame,
         get_player_country,
-        refresh_display,
-        set_can_pause
+        set_can_pause,
+        on_complete,
     ):
         self.event_frame = event_frame
         self.event_system = event_system
         self.show_only_frame = show_only_frame
-        self.show_game_frame = show_game_frame
         self.get_player_country = get_player_country
-        self.refresh_display = refresh_display
         self.set_can_pause = set_can_pause
+        self.on_complete = on_complete
         self.build_event_screen()
     def build_event_screen(self):
         self.event_text = tk.Label(
@@ -58,6 +56,4 @@ class EventUI:
         recruitment_country = self.get_player_country()
         self.event_system.apply_event_choice(recruitment_country, choice)
 
-        self.show_game_frame()
-        self.refresh_display()
-        self.set_can_pause(True)
+        self.on_complete()

@@ -17,6 +17,7 @@ class GameGUI:
         self.game = game
         self.event_sys = EventSystem()
         self.countries = countries
+        self.pending_month_actions: list[str] = []
         self.map_data = map_data
         self.window = tk.Tk()
         self.window.title("Python EU4 Simulator")
@@ -47,21 +48,18 @@ class GameGUI:
             self.event_frame,
             self.event_sys,
             self.show_only_frame,
-            self.show_game_frame,
             self.get_player_country,
-            self.refresh_display,
-            self.set_can_pause
+            self.set_can_pause,
+            self.process_next_month_action,
         )
         self.recruitment_ui = RecruitmentUI(
             self.recruitment_frame,
             self.show_only_frame,
-            self.show_game_frame,
             self.get_player_country,
             self.recruit_player_troops,
-            self.refresh_display,
             self.create_button,
             self.set_can_pause,
-            self.event_ui,
+            self.process_next_month_action,
         )
         self.advisor_ui = AdvisorUI(
             self.advisor_selection_frame,
@@ -241,14 +239,17 @@ class GameGUI:
         self.game.advance_month(self.countries)
         self.world_events_ui.refresh_events()
         self.refresh_display()
-        month_status = self.game.get_month_action()
-        if month_status == "recruit and event":
-
-            self.recruitment_ui.show_recruitment_screen(True)
-        elif month_status == "event":
+        self.pending_month_actions = self.game.get_month_actions()
+        self.process_next_month_action()
+    def process_next_month_action(self) -> None:
+        if not self.pending_month_actions:
+            self.show_game_frame()
+            return
+        next_action = self.pending_month_actions.pop(0)
+        if next_action == "recruit":
+            self.recruitment_ui.show_recruitment_screen()
+        elif next_action == "event":
             self.event_ui.show_event_screen()
-        elif month_status == "recruitment":
-            self.recruitment_ui.show_recruitment_screen(False)
     # ---------- Country / Advisors ----------
     def select_country(self, country_name: str) -> None:
         self.game.picked_country_name = country_name

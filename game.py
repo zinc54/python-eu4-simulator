@@ -35,18 +35,18 @@ class Game:
             self.event_log.extend(event_log)
             self.execute_ai_decision(country, decision)
 
-    def get_month_action(self):
+    def get_month_actions(self) -> list[str]:
         event_time = self.months_passed % 12 == 0
         recruitment_time = self.months_passed % 6 == 0
-
+        month_actions = []
         if event_time and recruitment_time:
-            return "recruit and event"
+            month_actions.append("recruit")
+            month_actions.append("event")
         elif event_time:
-            return "event"
+            month_actions.append("event")
         elif recruitment_time:
-            return "recruitment"
-        else:
-            return "continue"
+            month_actions.append("recruit")
+        return month_actions
 
     def advance_month(self, countries):
         for country in countries:

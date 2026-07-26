@@ -249,16 +249,16 @@ class GameFileTests(unittest.TestCase):
         game = Game()
 
         game.months_passed = 12
-        self.assertEqual(game.get_month_action(), "recruit and event")
+        self.assertEqual(game.get_month_actions(), ["recruit", "event"])
         game.months_passed = 24
-        self.assertEqual(game.get_month_action(), "recruit and event")
+        self.assertEqual(game.get_month_actions(), ["recruit", "event"])
         game.months_passed = 60
-        self.assertEqual(game.get_month_action(), "recruit and event")
+        self.assertEqual(game.get_month_actions(), ["recruit", "event"])
         game.months_passed = 6
-        self.assertEqual(game.get_month_action(), "recruitment")
+        self.assertEqual(game.get_month_actions(), ["recruit"])
 
         game.months_passed = 7
-        self.assertEqual(game.get_month_action(), "continue")
+        self.assertEqual(game.get_month_actions(), [])
     def test_valid_data_loads_correctly(self):
         test_data = {
             "country_data": {

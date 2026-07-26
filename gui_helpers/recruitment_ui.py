@@ -4,23 +4,19 @@ class RecruitmentUI:
             self,
             recruitment_frame,
             show_only_frame,
-            show_game_frame,
             get_player_country,
             recruit_player_troops,
-            refresh_display,
             create_button,
             set_can_pause,
-            event_ui,
+            on_complete,
     ):
         self.recruitment_frame = recruitment_frame
         self.show_only_frame = show_only_frame
-        self.show_game_frame = show_game_frame
         self.get_player_country = get_player_country
         self.recruit_player_troops = recruit_player_troops
-        self.refresh_display = refresh_display
         self.create_button = create_button
         self.set_can_pause = set_can_pause
-        self.event_ui = event_ui
+        self.on_complete = on_complete
         self.build_recruiting_screen()
     def build_recruiting_screen(self):
         self.recruitment_question = tk.Label(
@@ -55,8 +51,7 @@ class RecruitmentUI:
             "Cancel",
             self.cancel_recruitment
         )
-    def show_recruitment_screen(self, double_action: bool):
-        self.double_action = double_action
+    def show_recruitment_screen(self):
         self.set_can_pause(False)
         self.show_only_frame(self.recruitment_frame)
 
@@ -92,9 +87,4 @@ class RecruitmentUI:
         self.recruitment_entry.delete(0, tk.END)
         self.recruitment_button.pack()
         self.recruitment_cancel_button.pack()
-        if not self.double_action:
-            self.show_game_frame()
-            self.refresh_display()
-            self.set_can_pause(True)
-        else:
-            self.event_ui.show_event_screen()
+        self.on_complete()

@@ -22,7 +22,6 @@ class Country:
             number = self.discipline.replace("%", "")
             self.discipline = float(number) / 100
         self.cost_upfront = (self.troops / 1000) * 10
-        self.monthly_expenses = (self.troops / 1000) * 0.2
         if self.charge_upfront:
             self.ducats -= self.cost_upfront
     def to_dictionary(self):
@@ -89,6 +88,9 @@ class Country:
         return self.event_log
     def calculate_recruitment_cost(self, requested_stacks: int) -> int:
         return requested_stacks * 10
+    @property
+    def monthly_expenses(self) -> float:
+        return (self.troops / 1000) * 0.2
     def recruit_troops(
         self,
         requested_stacks,
@@ -103,10 +105,9 @@ class Country:
         elif requested_stacks <= 0:
             return "invalid_amount"
         else:
-            recruit_monthly_cost = requested_stacks * 0.2
             self.ducats -= recruit_upfront_cost
-            self.monthly_expenses += recruit_monthly_cost
             self.troops += 1000 * requested_stacks
+            recruit_monthly_cost = 0.2 * requested_stacks
+
             print(f"You have bought {requested_stacks} stacks of troops for an upfront cost of {recruit_upfront_cost:.2f} and an extra monthly cost of {recruit_monthly_cost:.2f}")
             return "success"
-
