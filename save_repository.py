@@ -33,6 +33,19 @@ class SaveRepository:
                 income REAL,
                 monthly_interest_payments REAL,
                 loans INTEGER,
+
+                monarch_mil INTEGER,
+                monarch_dip INTEGER,
+                monarch_admin INTEGER,
+
+                mil_advisor INTEGER,
+                dip_advisor INTEGER,
+                admin_advisor INTEGER,
+
+                mil_points INTEGER,
+                dip_points INTEGER,
+                admin_points INTEGER,
+
                 FOREIGN KEY (save_id) REFERENCES saves(id)
             )
         """)
@@ -47,6 +60,37 @@ class SaveRepository:
                 FOREIGN KEY (save_id) REFERENCES saves(id)
             )
         """)
+        self.migrate_countries_table()
+    def migrate_countries_table(self):
+        required_new_columns = (
+            "monarch_mil",
+            "monarch_dip",
+            "monarch_admin",
+            "mil_advisor",
+            "dip_advisor",
+            "admin_advisor",
+            "mil_points",
+            "dip_points",
+            "admin_points",
+        )
+
+        rows = self.cursor.execute(
+            "PRAGMA table_info(countries)"
+        ).fetchall()
+
+        existing_columns = {
+            row[1]
+            for row in rows
+        }
+        for column_name in required_new_columns:
+            if column_name not in existing_columns:
+                self.cursor.execute(
+                    f"""
+                    ALTER TABLE countries
+                    ADD COLUMN {column_name} INTEGER NOT NULL DEFAULT 0
+                    """
+                )
+        self.connection.commit()
     def close(self):
         self.connection.close()
     def delete_save(self, save_id):
@@ -85,14 +129,19 @@ class SaveRepository:
             INSERT INTO saves (save_name, month, player_country, monthly_advisor_expenses)
             VALUES (?, ?, ?, ?)
             """,
-            (final_save_name, game.months_passed, game.picked_country_name, game.monthly_advisor_expenses)
+            (
+                final_save_name,
+                game.months_passed,
+                game.picked_country_name,
+                game.monthly_advisor_expenses,
+            )
         )
         self.save_id = self.cursor.lastrowid
         for country in countries:
             self.cursor.execute(
                 """
-                INSERT INTO countries (save_id, name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO countries (save_id, name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans, monarch_mil, monarch_dip, monarch_admin, mil_advisor, dip_advisor, admin_advisor, mil_points, dip_points, admin_points)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     self.save_id,
@@ -107,6 +156,15 @@ class SaveRepository:
                     country.income,
                     country.monthly_interest_payments,
                     country.loans,
+                    country.monarch["mil"],
+                    country.monarch["dip"],
+                    country.monarch["admin"],
+                    country.advisors["mil"],
+                    country.advisors["dip"],
+                    country.advisors["admin"],
+                    country.monarch_points["mil"],
+                    country.monarch_points["dip"],
+                    country.monarch_points["admin"],
                 )
             )
         for event in event_log:
@@ -142,7 +200,7 @@ class SaveRepository:
         self.loaded_game.monthly_advisor_expenses = monthly_advisor_expenses
         self.cursor.execute(
             """
-            SELECT name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans
+            SELECT name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans, monarch_mil, monarch_dip, monarch_admin, mil_advisor, dip_advisor, admin_advisor, mil_points, dip_points, admin_points
             FROM countries 
             WHERE save_id = ?
             """,
@@ -151,13 +209,40 @@ class SaveRepository:
         loaded_countries = []
         country_rows = self.cursor.fetchall()
         for country in country_rows:
-            name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans = country
+            name, morale, discipline, troops, mil_tech, dip_tech, admin_tech, ducats, income, monthly_interest_payments, loans, monarch_mil, monarch_dip, monarch_admin, mil_advisor, dip_advisor, admin_advisor, mil_points, dip_points, admin_points = country
             technology = {
                 "mil": mil_tech,
                 "dip": dip_tech,
                 "admin": admin_tech
                 }
-            countryObject = Country(name, morale, discipline, troops, technology, ducats, income, False)
+            monarch = {
+                "mil": monarch_mil,
+                "dip": monarch_dip,
+                "admin": monarch_admin,
+            }
+            monarch_points = {
+                "mil": mil_points,
+                "dip": dip_points,
+                "admin": admin_points,
+            }
+            advisors = {
+                "mil": mil_advisor,
+                "dip": dip_advisor,
+                "admin": admin_advisor,
+            }
+            countryObject = Country(
+                name,
+                morale,
+                discipline,
+                troops,
+                technology,
+                ducats,
+                income,
+                charge_upfront=False,
+                monarch=monarch,
+                monarch_points=monarch_points,
+                advisors=advisors,
+            )
             countryObject.loans = loans
             countryObject.monthly_interest_payments = monthly_interest_payments
             loaded_countries.append(countryObject)

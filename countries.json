@@ -22,6 +22,9 @@
             "discipline": "110%",
             "troops": 40000,
             "technology": {"mil": 5, "dip": 3, "admin": 3},
+            "monarch": {"mil": 6, "dip": 4, "admin": 6},
+            "monarch_points": {"mil": 0, "dip": 0, "admin": 0},
+            "advisors": {"mil": 0, "dip": 0, "admin": 0},
             "ducats": 700,
             "income": 0
         },
@@ -31,6 +34,9 @@
             "discipline": "100%",
             "troops": 10000,
             "technology": {"mil": 3, "dip": 3, "admin": 3},
+            "monarch": {"mil": 4, "dip": 4, "admin": 4},
+            "monarch_points": {"mil": 0, "dip": 0, "admin": 0},
+            "advisors": {"mil": 0, "dip": 0, "admin": 0},
             "ducats": 200,
             "income": 0
         }

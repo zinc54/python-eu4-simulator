@@ -11,13 +11,15 @@ class AdvisorUI:
         game,
         show_only_frame,
         show_game_screen,
-        set_can_pause
+        set_can_pause,
+        get_player_country,
     ):
         self.advisor_selection_frame = advisor_selection_frame
         self.game = game
         self.show_only_frame = show_only_frame
         self.show_game_screen = show_game_screen
         self.set_can_pause = set_can_pause
+        self.get_player_country = get_player_country
         self.build_advisor_screen()
         
     def set_game(self, game):
@@ -31,9 +33,18 @@ class AdvisorUI:
         military_level = int(self.military_advisor_level.get())
         diplomatic_level = int(self.diplomatic_advisor_level.get())
         administrative_level = int(self.administrative_advisor_level.get())
+
         mil_advisor_cost = self.game.advisor_costs[military_level]
         dip_advisor_cost = self.game.advisor_costs[diplomatic_level]
         admin_advisor_cost = self.game.advisor_costs[administrative_level]
+
+        player_country = self.get_player_country()
+        if player_country is None:
+            return
+        player_country.advisors["mil"] = military_level
+        player_country.advisors["dip"] = diplomatic_level
+        player_country.advisors["admin"] = administrative_level
+
         self.total_advisor_cost = mil_advisor_cost + dip_advisor_cost + admin_advisor_cost
         self.advisor_cost_label.config(
             text=f"The total advisor cost for your country is: {self.total_advisor_cost}"

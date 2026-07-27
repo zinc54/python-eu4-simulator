@@ -14,6 +14,9 @@ class CountryDataLoader():
             "discipline",
             "troops",
             "technology",
+            "monarch",
+            "monarch_points",
+            "advisors",
             "ducats",
             "income",
         ]
@@ -50,6 +53,9 @@ class CountryDataLoader():
                 country_data["technology"],
                 country_data["ducats"],
                 country_data["income"],
+                monarch=country_data["monarch"],
+                monarch_points=country_data["monarch_points"],
+                advisors=country_data["advisors"],
             )
             countries_data_list.append(country_object)
         map_data = self.data["map_data"]

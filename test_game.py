@@ -117,7 +117,6 @@ class BattleTests(unittest.TestCase):
             700,
             0
         )
-
     def test_battles(self):
         weak_morale_before = self.weaker_country.morale
         strong_morale_before = self.stronger_country.morale
@@ -132,6 +131,16 @@ class BattleTests(unittest.TestCase):
         self.assertAlmostEqual(weak_morale_before - self.weaker_country.morale, 1)
         self.assertAlmostEqual(weak_troops_before - self.weaker_country.troops, 6600)
         self.assertAlmostEqual(strong_troops_before - self.stronger_country.troops, 8000 / 30)
+    def test_after_battle_troop_costs(self):
+        army_cost_before = self.weaker_country.monthly_expenses
+        troops_before = self.weaker_country.troops
+        self.assertEqual(army_cost_before, (self.weaker_country.troops / 1000) * 0.2)
+        test_battle = Battle(self.stronger_country, self.weaker_country)
+        test_battle.resolve_battle()
+        army_cost_after = self.weaker_country.monthly_expenses
+        self.assertLess(self.weaker_country.troops, troops_before)
+        self.assertLess(army_cost_after, army_cost_before)
+        self.assertEqual(army_cost_after, (self.weaker_country.troops / 1000) * 0.2)
     def test_battles_below_zero(self):
         zero_test_weak_country = self.weaker_country
         zero_test_strong_country = self.stronger_country
@@ -268,6 +277,9 @@ class GameFileTests(unittest.TestCase):
                     "discipline": "100%",
                     "troops": 10000,
                     "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch_points": {"mil": 0, "dip": 0, "admin": 0},
+                    "advisors": {"mil": 0, "dip": 0, "admin": 0},
                     "ducats": 200,
                     "income": 0,
                 }
@@ -300,6 +312,9 @@ class GameFileTests(unittest.TestCase):
                     "morale": 4.0,
                     "troops": 10000,
                     "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch_points": {"mil": 0, "dip": 0, "admin": 0},
+                    "advisors": {"mil": 0, "dip": 0, "admin": 0},
                     "ducats": 200,
                     "income": 0,
                 }
@@ -330,6 +345,9 @@ class GameFileTests(unittest.TestCase):
                     "discipline": "100%",
                     "troops": 10000,
                     "technology": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch": {"mil": 3, "dip": 3, "admin": 3},
+                    "monarch_points": {"mil": 0, "dip": 0, "admin": 0},
+                    "advisors": {"mil": 0, "dip": 0, "admin": 0},
                     "ducats": 200,
                     "income": 0,
                 }

@@ -11,7 +11,6 @@ class Battle:
         defender_troops_before = self.defender.troops
         defender_morale_before = self.defender.morale
         if self.attacker_damage >= self.defender_damage:
-            print("The attacker has won the battle!")
             self.defender.morale -= 1
             below_zero_defender = self.defender.morale <= 0
             if not below_zero_defender:
@@ -26,7 +25,6 @@ class Battle:
                 self.defender.morale = 0
             self.attacker_won = True
         else:
-            print("The defender has won the battle!")
             self.attacker.morale -= 1.2
             below_zero_attacker = self.attacker.morale <= 0
             if not below_zero_attacker:

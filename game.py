@@ -55,6 +55,8 @@ class Game:
                 self.picked_country_name,
                 self.months_passed,
             )
+            country.process_monthly_monarch_points()
+
             self.event_log.extend(country_events)
         self.run_ai_turns(countries)
         self.months_passed += 1

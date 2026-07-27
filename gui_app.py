@@ -66,7 +66,8 @@ class GameGUI:
             self.game,
             self.show_only_frame,
             self.show_game_screen,
-            self.set_can_pause
+            self.set_can_pause,
+            self.get_player_country,
         )
         self.build_start_screen()
         self.build_country_screen()

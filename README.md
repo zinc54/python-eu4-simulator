@@ -38,6 +38,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - SQLite persistence for world-event history across save/load sessions
 - Queued monthly action sequencing so recruitment and random events both finish before the next month when their schedules overlap
 - Army maintenance that automatically recalculates from current troop counts after recruitment, battles, and events
+- Country-specific monarch stats, advisor levels, and monthly monarch-point accumulation
+- SQLite persistence and automatic schema migration for monarch, advisor, and monarch-point data
 
 ## Engineering Highlights
 
@@ -60,6 +62,9 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Month-action tests cover overlapping recruitment and event schedules, including months 12, 24, and 60
 - `GameGUI` owns an ordered monthly action queue, while focused UI helpers report completion through callbacks
 - Army maintenance is a computed `Country` property, preventing stale costs when troop counts change
+- Advisor selections update the active `Country` directly, keeping country advisor data as the single source of truth
+- The SQLite repository detects and adds missing country columns so older save databases remain loadable
+- Mutable country dictionaries use dataclass `default_factory` values so countries never share state accidentally
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -138,6 +143,7 @@ The database stores:
 - selected player country
 - monthly advisor expenses
 - country stats for each saved country
+- monarch stats, advisor levels, and accumulated monarch points for every country
 - structured world-event history
 
 The GUI can:
@@ -177,6 +183,7 @@ This project helped me learn:
 - Validating configuration data before the app starts
 - SQLite databases
 - SQL tables, rows, primary keys, foreign keys, `SELECT`, `INSERT`, `UPDATE`, and `DELETE`
+- Idempotent SQLite schema migrations using `PRAGMA table_info` and `ALTER TABLE`
 - Turning database rows back into Python objects
 - Input validation and exception handling
 - Automated tests with `unittest`
@@ -189,6 +196,8 @@ This project helped me learn:
 - Coordinating multiple scheduled actions that occur during the same game month
 - Using completion callbacks to sequence Tkinter screens without blocking the event loop
 - Using `@property` for values derived from other state instead of manually synchronizing duplicate state
+- Using dataclass `default_factory` for independent mutable defaults
+- Keeping one source of truth instead of duplicating advisor state across game and country objects
 - Building a scrollable Tkinter text panel and toggling it with callbacks
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import cast
 from game_event import GameEvent
 
@@ -16,6 +16,15 @@ class Country:
     loans: int = 0
     max_loans: int = 10
     monthly_interest_payments: float = 0
+    monarch: dict[str, int] = field(
+        default_factory=lambda: {"mil": 0, "dip": 0, "admin": 0}
+    )
+    monarch_points: dict[str, int] = field(
+        default_factory=lambda: {"mil": 0, "dip": 0, "admin": 0}
+    )
+    advisors: dict[str, int] = field(
+        default_factory=lambda: {"mil": 0, "dip": 0, "admin": 0}
+    )
 
     def __post_init__(self):
         if isinstance(self.discipline, str):
@@ -31,6 +40,9 @@ class Country:
             "discipline": self.discipline,
             "troops": self.troops,
             "technology": self.technology,
+            "monarch": self.monarch,
+            "monarch_points": self.monarch_points,
+            "advisors": self.advisors,
             "ducats": self.ducats,
             "income": self.income,
             "monthlyInterestPayments": self.monthly_interest_payments,
@@ -86,6 +98,12 @@ class Country:
             else:
                 self.add_loan(75, interest, months_passed)
         return self.event_log
+    def process_monthly_monarch_points(self) -> None:
+        for power_type in ("mil", "dip", "admin"):
+            self.monarch_points[power_type] += (
+                self.advisors[power_type] + self.monarch[power_type]
+            )
+
     def calculate_recruitment_cost(self, requested_stacks: int) -> int:
         return requested_stacks * 10
     @property
