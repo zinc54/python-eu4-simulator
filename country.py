@@ -30,6 +30,7 @@ class Country:
         if isinstance(self.discipline, str):
             number = self.discipline.replace("%", "")
             self.discipline = float(number) / 100
+        self.technology_cost = 100
         self.cost_upfront = (self.troops / 1000) * 10
         if self.charge_upfront:
             self.ducats -= self.cost_upfront
@@ -67,7 +68,20 @@ class Country:
         )
         self.event_log.append(loan_event)
         self.monthly_interest_payments += (loan_size * interest) / 12
-
+    def calculate_technology_progress(self, power_type: str) -> float | str:
+        if power_type not in ["mil", "dip", "admin"]:
+            return "invalid_category"
+        tech_percentage = (self.monarch_points[power_type] / self.technology_cost) * 100
+        return min(tech_percentage, 100)
+    def upgrade_technology(self, power_type: str) -> str:
+        if power_type not in ["mil", "dip", "admin"]:
+            return "invalid_category"
+        if self.monarch_points[power_type] >= self.technology_cost:
+            self.technology[power_type] += 1
+            self.monarch_points[power_type] -= self.technology_cost
+            return "success"
+        else:
+            return "not_enough_points"
     def process_monthly_economy(
         self,
         advisor_costs,
