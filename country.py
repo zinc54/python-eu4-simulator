@@ -72,7 +72,7 @@ class Country:
         if power_type not in ["mil", "dip", "admin"]:
             return "invalid_category"
         tech_percentage = (self.monarch_points[power_type] / self.technology_cost) * 100
-        return min(tech_percentage, 100)
+        return min(tech_percentage, 100.0)
     def upgrade_technology(self, power_type: str) -> str:
         if power_type not in ["mil", "dip", "admin"]:
             return "invalid_category"

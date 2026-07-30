@@ -170,6 +170,9 @@ class GameFileTests(unittest.TestCase):
             700,
             0
         )
+        self.weaker_country.monarch["mil"] = 6
+        self.stronger_country.advisors["dip"] = 4
+        self.weaker_country.monarch_points["admin"] = 37
         self.original_countries = [self.weaker_country, self.stronger_country]
 
     def test_month_passing(self):
@@ -215,7 +218,9 @@ class GameFileTests(unittest.TestCase):
             self.assertEqual(loaded_countries[i].income, self.original_countries[i].income)
             self.assertEqual(loaded_countries[i].monthly_interest_payments, self.original_countries[i].monthly_interest_payments)
             self.assertEqual(loaded_countries[i].loans, self.original_countries[i].loans)
-
+            self.assertEqual(loaded_countries[i].monarch, self.original_countries[i].monarch)
+            self.assertEqual(loaded_countries[i].monarch_points, self.original_countries[i].monarch_points)
+            self.assertEqual(loaded_countries[i].advisors, self.original_countries[i].advisors)
         self.assertEqual(
             test_save_sql.event_log,
             loaded_game_sql.event_log,
@@ -492,5 +497,54 @@ class EventLogTests(unittest.TestCase):
         )
         self.event_log_test_game.advance_month(self.countries)
         self.assertGreater(len(self.event_log_test_game.event_log), old_event_log_length)
+class TechnologyTests(unittest.TestCase):
+    def setUp(self):
+        self.technology_test_game = Game()
+        self.mid_country = Country(
+            "Mid Country",
+            4.0,
+            "105%",
+            20000,
+            {"mil": 4, "dip": 3, "admin": 3},
+            300,
+            5,
+            charge_upfront=False,
+        )
+    def test_technology_upgrade_succeeds_with_enough_points(self):
+        self.mid_country.monarch_points["mil"] = 100
+        result = self.mid_country.upgrade_technology("mil")
+        self.assertEqual(result, "success")
+        self.assertEqual(self.mid_country.technology["mil"], 5)
+        self.assertEqual(self.mid_country.monarch_points["mil"], 0)
+    def test_technology_upgrade_fails_without_enough_points(self):
+        self.mid_country.monarch_points["mil"] = 99
+        result = self.mid_country.upgrade_technology("mil")
+        self.assertEqual(result, "not_enough_points")
+        self.assertEqual(self.mid_country.technology["mil"], 4)
+        self.assertEqual(self.mid_country.monarch_points["mil"], 99)
+    def test_technology_upgrade_preserves_leftover_points(self):
+        self.mid_country.monarch_points["mil"] = 330
+        self.mid_country.upgrade_technology("mil")
+        self.mid_country.upgrade_technology("mil")
+        self.mid_country.upgrade_technology("mil")
+        self.assertEqual(self.mid_country.technology["mil"], 7)
+        self.assertEqual(self.mid_country.monarch_points["mil"], 30)
+    def test_technology_progress_caps_at_100_percent(self):
+        self.mid_country.monarch_points["mil"] = 80
+        percentage_one = self.mid_country.calculate_technology_progress("mil")
+        self.assertEqual(percentage_one, 80.0)
+        self.mid_country.monarch_points["mil"] = 100
+        percentage_two = self.mid_country.calculate_technology_progress("mil")
+        self.assertEqual(percentage_two, 100.0)
+        self.mid_country.monarch_points["mil"] = 160
+        percentage_three = self.mid_country.calculate_technology_progress("mil")
+        self.assertEqual(percentage_three, 100.0)
+        self.assertIsInstance(percentage_three, float)
+    def test_monthly_monarch_points_are_generated(self):
+        self.mid_country.monarch["mil"] = 4
+        self.mid_country.advisors["mil"] = 2
+        self.mid_country.monarch_points["mil"] = 10
+        self.mid_country.process_monthly_monarch_points()
+        self.assertEqual(self.mid_country.monarch_points["mil"], 16)
 if __name__ == "__main__":
     unittest.main()

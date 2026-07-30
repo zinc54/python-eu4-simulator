@@ -11,6 +11,8 @@ from collections.abc import Callable
 from map_ui import MapUI
 from game_event import GameEvent
 from gui_helpers.world_events_ui import WorldEventsUI
+from gui_helpers.technology_ui import TechnologyUI
+
 class GameGUI:
     def __init__(self, game, countries, map_data):
         self.save_rep = SaveRepository()
@@ -69,6 +71,13 @@ class GameGUI:
             self.set_can_pause,
             self.get_player_country,
         )
+        self.technology_ui = TechnologyUI(
+            self.technology_frame,
+            self.show_only_frame,
+            self.show_game_frame,
+            self.get_player_country,
+            self.create_button,
+        )
         self.build_start_screen()
         self.build_country_screen()
         self.build_game_screen()
@@ -88,6 +97,7 @@ class GameGUI:
         self.pre_load_frame = tk.Frame(self.window)
         self.pre_save_frame = tk.Frame(self.window)
         self.map_frame = tk.Frame(self.window)
+        self.technology_frame = tk.Frame(self.window)
         self.frames = [
             self.start_frame,
             self.game_frame,
@@ -99,6 +109,7 @@ class GameGUI:
             self.pre_load_frame,
             self.pre_save_frame,
             self.map_frame,
+            self.technology_frame,
         ]
 
     def create_button(self, frame: tk.Frame, text: str, command: Callable[[], None]) -> tk.Button:
@@ -181,6 +192,12 @@ class GameGUI:
             self.show_map_screen
         )
         self.create_button(self.game_frame, "📜", self.world_events_ui.toggle)
+
+        self.create_button(
+            self.game_frame,
+            "Technology",
+            self.technology_ui.show_technology_screen,
+        )
     def show_map_screen(self):
         self.map_ui.refresh_map_display()
         self.show_only_frame(self.map_frame)

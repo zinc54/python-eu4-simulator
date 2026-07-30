@@ -40,6 +40,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Army maintenance that automatically recalculates from current troop counts after recruitment, battles, and events
 - Country-specific monarch stats, advisor levels, and monthly monarch-point accumulation
 - SQLite persistence and automatic schema migration for monarch, advisor, and monarch-point data
+- Technology screen with military, diplomatic, and administrative upgrade controls
+- Monarch-point technology purchases with capped progress bars, immediate level updates, leftover-point preservation, and result popups
 
 ## Engineering Highlights
 
@@ -47,7 +49,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Country and map startup data is loaded through a dedicated loader instead of being hardcoded in `main.py`
 - `countries.json` separates gameplay stats from map drawing data
 - Startup data validation catches missing country/map configuration before the GUI launches
-- GUI helper package for save/load, recruitment, events, and advisor selection screens
+- GUI helper package for save/load, recruitment, events, advisor selection, and technology screens
 - SQLite persistence layer with save slots, country rows, duplicate save-name handling, load support, and delete support
 - Backend/game logic is tested separately from the Tkinter GUI
 - Country-data tests use isolated temporary JSON files instead of modifying the real configuration
@@ -65,6 +67,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Advisor selections update the active `Country` directly, keeping country advisor data as the single source of truth
 - The SQLite repository detects and adds missing country columns so older save databases remain loadable
 - Mutable country dictionaries use dataclass `default_factory` values so countries never share state accidentally
+- Technology calculations and purchases remain in the `Country` backend, while `TechnologyUI` builds and refreshes the Tkinter presentation
+- Technology regression tests cover successful and rejected upgrades, surplus-point preservation, capped progress, monthly point generation, and SQLite persistence
 - `Country` uses a dataclass with `__post_init__` for setup logic such as discipline conversion and army costs
 - GitHub Actions CI runs the automated test suite after pushes and pull requests
 - Ruff checks the active project code for unused imports, unused variables, and common Python style issues
@@ -80,9 +84,9 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 
 - `main.py` - starts the GUI application
 - `gui_app.py` - main GUI coordinator and shared Tkinter navigation
-- `gui_helpers/` - focused GUI helper modules for save/load, recruitment, events, and advisors
+- `gui_helpers/` - focused GUI helper modules for save/load, recruitment, events, advisors, and technology
 - `game.py` - core game state and month progression
-- `country.py` - dataclass for country stats, economy, loans, recruitment, and damage
+- `country.py` - dataclass for country stats, economy, loans, recruitment, technology, and damage
 - `country_data_loader.py` - loads and validates country/map setup data from JSON
 - `countries.json` - data-driven country stats and map region configuration
 - `battle.py` - battle resolution logic
@@ -176,6 +180,7 @@ This project helped me learn:
 - Splitting a program into multiple modules
 - GUI programming with Tkinter
 - Buttons, frames, labels, entries, callbacks, and dynamic widgets
+- Determinate Tkinter progress bars and message-box feedback
 - Tkinter Canvas basics for drawing clickable map regions
 - Tkinter popup windows with `Toplevel`
 - JSON saving and loading
@@ -198,6 +203,8 @@ This project helped me learn:
 - Using `@property` for values derived from other state instead of manually synchronizing duplicate state
 - Using dataclass `default_factory` for independent mutable defaults
 - Keeping one source of truth instead of duplicating advisor state across game and country objects
+- Separating one-time widget construction from refreshing country-dependent GUI values
+- Preserving surplus resources when repeated upgrades spend a fixed cost
 - Building a scrollable Tkinter text panel and toggling it with callbacks
 - Virtual environments for isolated project dependencies
 - Designing collection-based displays without fixed list indexes
