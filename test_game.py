@@ -407,7 +407,11 @@ class AIControllerTests(unittest.TestCase):
             charge_upfront=False,
         )
         self.possible_targets = [self.strong_target, self.weak_target]
-
+    def test_ai_upgrades_tech(self):
+        self.ai_country.monarch_points["mil"] = (self.ai_country.technology_cost * 3) + 30
+        self.ai_controller.choose_technology(self.ai_country)
+        self.assertEqual(self.ai_country.technology["mil"], 7)
+        self.assertEqual(self.ai_country.monarch_points["mil"], 30)
     def test_recruits_when_army_is_small_and_country_is_wealthy(self):
         self.ai_country.troops = 8000
         self.ai_country.ducats = 600

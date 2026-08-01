@@ -17,9 +17,12 @@ class AIController:
         possible_targets: list[Country],
         months_passed: int = 0,
     ) -> tuple[AIDecision, list[GameEvent]]:
+        self.choose_technology(ai_country)
+
         recruited_stacks = 3
         recruitment_cost = ai_country.calculate_recruitment_cost(recruited_stacks)
         self.event_log: list[GameEvent] = []
+
         if (ai_country.income > 10 or ai_country.ducats > 500) and (ai_country.ducats >= recruitment_cost) and (ai_country.troops < 10000):
             recruit_event = GameEvent(months_passed + 1, ai_country.name, f"{ai_country.name} has recruited {recruited_stacks} stacks of troops!", "recruitment")
             self.event_log.append(recruit_event)
@@ -30,3 +33,14 @@ class AIController:
                 self.event_log.append(battle_event)
                 return AIDecision(action="attack", target=country), self.event_log
         return AIDecision(action="wait"), self.event_log
+
+    def choose_technology(
+        self,
+        ai_country: Country,
+    ) -> None:
+        while ai_country.monarch_points["mil"] >= ai_country.technology_cost:
+            ai_country.upgrade_technology("mil")
+        while ai_country.monarch_points["dip"] >= ai_country.technology_cost:
+            ai_country.upgrade_technology("dip")
+        while ai_country.monarch_points["admin"] >= ai_country.technology_cost:
+            ai_country.upgrade_technology("admin")
