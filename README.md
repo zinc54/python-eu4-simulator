@@ -20,6 +20,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Battle damage calculations
 - Clickable map screen with country regions
 - Map-based battle launching and battle result popup
+- Country regions displayed as 3x3 province grids on the map
+- Visual province conquest after player-launched battles, with winner-color transfers and country names that shrink as territory is lost
 - Country and map setup loaded from `countries.json`
 - Pause menu with save/load/exit options
 - SQLite save/load system with multiple save slots
@@ -166,6 +168,8 @@ The current main version is the GUI + SQLite version.
 Future cleanup goals:
 - Add stronger save-name validation
 - Continue expanding data-driven country/map configuration
+- Replace the visual prototype's Canvas-ID ownership with stable backend province identities
+- Extend province conquest to AI battles, country elimination, automated tests, and SQLite persistence
 - Continue separating GUI code from backend game logic
 - Continue splitting large GUI sections into focused UI modules
 - Polish the GUI layout and user feedback

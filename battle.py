@@ -40,6 +40,7 @@ class Battle:
             self.attacker_won = False
         battle_result = {
             "winner": "unknown",
+            "loser": "unknown",
             "attacker": {
                 "name": self.attacker.name,
                 "before": {
@@ -65,6 +66,8 @@ class Battle:
         }
         if self.attacker_won:
             battle_result["winner"] = self.attacker.name
+            battle_result["loser"] = self.defender.name
         else:
             battle_result["winner"] = self.defender.name
+            battle_result["loser"] = self.attacker.name
         return battle_result

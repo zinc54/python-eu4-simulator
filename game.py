@@ -20,7 +20,8 @@ class Game:
             3: 9,
         }
         self.picked_country_name: str = ""
-
+        self.province_ids: dict[str, list[int]] = {}
+        self.name_ids: dict[str, int] = {}
     def run_ai_turns(self, countries: list[Country]) -> None:
         for country in countries:
             if country.name == self.picked_country_name:
@@ -97,3 +98,19 @@ class Game:
             self.event_log.append(recruitment_event)
 
         return result
+    def delete_country(self, country_name):
+        pass
+    def transfer_province(self, result):
+        winner = result["winner"]
+        loser = result["loser"]
+        name_id = self.name_ids[loser]
+        lost_province = None
+
+        if len(self.province_ids[loser]) == 0:
+            self.delete_country(loser)
+            return lost_province, name_id, True
+        lost_province = self.province_ids[loser].pop(0)
+        self.province_ids[winner].append(lost_province)
+        if len(self.province_ids[loser]) == 0:
+            return lost_province, name_id, None
+        return lost_province, name_id, False
