@@ -21,7 +21,8 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - Clickable map screen with country regions
 - Map-based battle launching and battle result popup
 - Country regions displayed as 3x3 province grids on the map
-- Visual province conquest after player-launched battles, with winner-color transfers and country names that shrink as territory is lost
+- Backend province objects with stable identities, original countries, current owners, and grid positions
+- Province conquest after player-launched battles, with synchronized backend ownership, winner-color and click-target transfers, and country names that shrink as territory is lost
 - Country and map setup loaded from `countries.json`
 - Pause menu with save/load/exit options
 - SQLite save/load system with multiple save slots
@@ -89,6 +90,7 @@ The project started as a beginner terminal script and grew into a GUI-based stra
 - `gui_helpers/` - focused GUI helper modules for save/load, recruitment, events, advisors, and technology
 - `game.py` - core game state and month progression
 - `country.py` - dataclass for country stats, economy, loans, recruitment, technology, and damage
+- `province.py` - dataclass for stable province identity, ownership, and grid position
 - `country_data_loader.py` - loads and validates country/map setup data from JSON
 - `countries.json` - data-driven country stats and map region configuration
 - `battle.py` - battle resolution logic
@@ -168,7 +170,6 @@ The current main version is the GUI + SQLite version.
 Future cleanup goals:
 - Add stronger save-name validation
 - Continue expanding data-driven country/map configuration
-- Replace the visual prototype's Canvas-ID ownership with stable backend province identities
 - Extend province conquest to AI battles, country elimination, automated tests, and SQLite persistence
 - Continue separating GUI code from backend game logic
 - Continue splitting large GUI sections into focused UI modules

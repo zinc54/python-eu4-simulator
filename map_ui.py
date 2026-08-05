@@ -18,6 +18,10 @@ class MapUI:
         self.show_game_screen = show_game_screen
         self.map_data = map_data
         self.selected_country_name = ""
+        self.province_ids: dict[str, list[int]] = {}
+        self.name_ids: dict[str, int] = {}
+        self.stable_id_to_province_id: dict[str, int] = {}
+        self.disabled: list[str] = []
         self.canvas = tk.Canvas(
             self.parent_frame,
             width=600,
@@ -26,6 +30,7 @@ class MapUI:
         )
         self.canvas.pack()
         self.build_map()
+        self.build_id_mapping()
     def select_country(self, country_name):
         if country_name == self.game.picked_country_name:
             selection_message = f"You are playing as {country_name}"
@@ -50,7 +55,13 @@ class MapUI:
             self.select_country(country_name)
 
         return handle_country_click
+    def build_id_mapping(self):
+        self.stable_id_to_province_id = {}
 
+        for country_name in self.game.provinces_by_country.keys():
+            for i in range(len(self.game.provinces_by_country[country_name])):
+                stable_id = self.game.provinces_by_country[country_name][i]
+                self.stable_id_to_province_id[stable_id] = self.province_ids[country_name][i]
     def show_battle_result(self, result):
         result_window = tk.Toplevel(self.parent_frame)
         result_window.title("Battle Results")
@@ -135,22 +146,33 @@ class MapUI:
     def transfer_province_ui(self, result):
         winner = result["winner"]
         loser = result["loser"]
-        lost_province_id, name_id, country_eliminated = self.game.transfer_province(result)
-        if country_eliminated:
-            self.canvas.delete(name_id)
+        if loser in self.disabled:
             return
-        elif country_eliminated is None:
-            self.canvas.delete(name_id)
-            self.canvas.itemconfig(lost_province_id, fill=self.map_data[winner]["color"])
-            return
-        starting_size = 16
-        lost_count = 9 - len(self.game.province_ids[loser])
-        new_size = starting_size * (0.9 ** lost_count)
-        self.canvas.itemconfig(lost_province_id, fill=self.map_data[winner]["color"])
+        loser_name_id = self.name_ids[loser]
+
+        transferred_province_id, country_eliminated = self.game.transfer_province(result)
+        transferred_canvas_id = self.stable_id_to_province_id[transferred_province_id]
         self.canvas.itemconfig(
-            name_id,
-            font=("Arial", round(new_size), "bold"),
+            transferred_canvas_id,
+            fill=self.map_data[winner]["color"],
         )
+        self.canvas.dtag(transferred_canvas_id, loser)
+        self.canvas.addtag_withtag(winner, transferred_canvas_id)
+
+        self.province_ids[winner].append(transferred_canvas_id)
+        self.province_ids[loser].remove(transferred_canvas_id)
+
+        if country_eliminated:
+            self.canvas.delete(loser_name_id)
+            self.disabled.append(loser)
+        else:
+            starting_size = 16
+            lost_count = 9 - len(self.province_ids[loser])
+            new_size = starting_size * (0.9 ** lost_count)
+            self.canvas.itemconfig(
+                loser_name_id,
+                font=("Arial", round(new_size), "bold"),
+            )
     def start_battle(self):
         attacker = None
         defender = None
@@ -207,8 +229,6 @@ class MapUI:
             anchor="nw",
             font=("Arial", 12, "bold"),
         )
-        self.province_ids: dict[str, list[int]] = {}
-        self.name_ids: dict[str, int] = {}
         for country in self.countries:
             map_data = self.map_data[country.name]
             width = map_data["x2"] - map_data["x1"]
@@ -218,8 +238,8 @@ class MapUI:
 
             province_width = width / 3
             province_height = height  / 3
-            self.game.province_ids[country.name] = []
-            self.game.name_ids[country.name] = -999
+            self.province_ids[country.name] = []
+            self.name_ids[country.name] = -999
             for row in rows:
                 for column in columns:
                     province_x1 = map_data["x1"] + column * province_width
@@ -235,7 +255,7 @@ class MapUI:
                         fill=map_data["color"],
                         tags=country.name
                     )
-                    self.game.province_ids[country.name].append(province_id)
+                    self.province_ids[country.name].append(province_id)
 
             center_x = (map_data["x1"] + map_data["x2"]) / 2
             center_y = (map_data["y1"] + map_data["y2"]) / 2
@@ -248,7 +268,7 @@ class MapUI:
                 font=("Arial", 16, "bold"),
                 tags=country.name,
             )
-            self.game.name_ids[country.name] = name_id
+            self.name_ids[country.name] = name_id
             self.canvas.tag_bind(
                 country.name,
                 "<Button-1>",

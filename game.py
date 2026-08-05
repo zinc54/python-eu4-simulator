@@ -3,13 +3,15 @@ from country import Country
 from ai_controller import AIController, AIDecision
 from battle import Battle
 from game_event import GameEvent
-
+from province import Province
 
 class Game:
     def __init__(self):
         self.months_passed = 0
         self.ai_controller = AIController()
         self.event_log: list[GameEvent] = []
+        self.provinces: list[Province] = []
+        self.provinces_by_country: dict[str, list[str]] = {}
         self.event_sys = EventSystem()
         self.running = True
         self.monthly_advisor_expenses = 0
@@ -20,8 +22,6 @@ class Game:
             3: 9,
         }
         self.picked_country_name: str = ""
-        self.province_ids: dict[str, list[int]] = {}
-        self.name_ids: dict[str, int] = {}
     def run_ai_turns(self, countries: list[Country]) -> None:
         for country in countries:
             if country.name == self.picked_country_name:
@@ -35,7 +35,16 @@ class Game:
             decision, event_log = self.ai_controller.choose_action(country, possible_targets, self.months_passed)
             self.event_log.extend(event_log)
             self.execute_ai_decision(country, decision)
-
+    def build_provinces(self, countries: list[Country]) -> None:
+        self.provinces = []
+        self.provinces_by_country = {}
+        for country in countries:
+            self.provinces_by_country[country.name] = []
+            for row in range(3):
+                for column in range(3):
+                    province = Province(f"{country.name}_{row}_{column}", country.name, country.name, row, column)
+                    self.provinces.append(province)
+                    self.provinces_by_country[country.name].append(province.stable_id)
     def get_month_actions(self) -> list[str]:
         event_time = self.months_passed % 12 == 0
         recruitment_time = self.months_passed % 6 == 0
@@ -103,14 +112,15 @@ class Game:
     def transfer_province(self, result):
         winner = result["winner"]
         loser = result["loser"]
-        name_id = self.name_ids[loser]
-        lost_province = None
 
-        if len(self.province_ids[loser]) == 0:
-            self.delete_country(loser)
-            return lost_province, name_id, True
-        lost_province = self.province_ids[loser].pop(0)
-        self.province_ids[winner].append(lost_province)
-        if len(self.province_ids[loser]) == 0:
-            return lost_province, name_id, None
-        return lost_province, name_id, False
+        for province in self.provinces:
+            if province.current_owner == loser:
+                province.current_owner = winner
+                lost_province_id = province.stable_id
+                self.provinces_by_country[winner].append(province.stable_id)
+                self.provinces_by_country[loser].remove(province.stable_id)
+                break
+        for province in self.provinces:
+            if province.current_owner == loser:
+                return lost_province_id, False
+        return lost_province_id, True

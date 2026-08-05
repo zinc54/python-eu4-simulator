@@ -28,6 +28,7 @@ class GameGUI:
         self.can_pause = False
         self.create_frames()
         self.world_events_ui = WorldEventsUI(self.window, self.get_event_log)
+        self.game.build_provinces(self.countries)
         self.map_ui = MapUI(
             self.map_frame,
             self.game,
